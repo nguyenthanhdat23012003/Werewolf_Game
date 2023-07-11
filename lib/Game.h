@@ -6,7 +6,7 @@ private:
     int n_players;
     int werewolfCount;              // Number of werewolves
     int villagerCount;              // Number of villagers
-    vector<Character *> characters; // Stores the characters of the players
+    vector<pair<int, Character *>> characters; // Stores the characters of the players
 
     void initializeCharacters()
     {
@@ -19,17 +19,23 @@ private:
 
         for (int i = 0; i < numWerewolves; i++)
         {
-            characters.push_back(new Werewolf());
+            pair<int, Character *> temp;
+            temp.second = new Werewolf();
+            characters.push_back(temp);
         }
 
         for (int i = 0; i < numSeers; i++)
         {
-            characters.push_back(new Seer());
+            pair<int, Character *> temp;
+            temp.second = new Seer();
+            characters.push_back(temp);
         }
 
         for (int i = 0; i < numVillagers; i++)
         {
-            characters.push_back(new Villager());
+            pair<int, Character *> temp;
+            temp.second = new Villager();
+            characters.push_back(temp);
         }
     }
 
@@ -45,31 +51,31 @@ public:
         cout << "\nSTATUS\n";
         cout << "Werewolf " << werewolfCount << " VS " << villagerCount << " Villager" << endl;
         cout << "Up-to-date list of characters:\n";
-        for (Character *character : characters)
+        for (auto& character : characters)
         {
-            cout << "\t" << character->getName() << ((character->isAlive) ? " alive" : " dead") << endl;
+            cout << "\t" << character.second->getName() << ((character.second->isAlive) ? " alive" : " dead") << endl;
         }
         cout << "END STATUS\n";
     }
 
     void night()
     {
-        for (Character *character : characters)
+        for (auto& character : characters)
         {
-            if (!character->isAlive)
+            if (!character.second->isAlive)
                 continue;
 
-            if (character->nightActionParametersCount == 0)
+            if (character.second->nightActionParametersCount == 0)
             {
-                character->nightAction();
+                character.second->nightAction();
             }
-            else if (character->nightActionParametersCount == 1)
+            else if (character.second->nightActionParametersCount == 1)
             {
-                cout << "You are " << character->getName() << endl;
+                cout << "You are " << character.second->getName() << endl;
                 cout << "Enter the target's index for night action: ";
                 int targetIndex;
                 cin >> targetIndex;
-                character->nightAction(characters[targetIndex]);
+                character.second->nightAction(characters[targetIndex].second);
             }
             else
             {
@@ -80,22 +86,22 @@ public:
 
     void day()
     {
-        for (Character *character : characters)
+        for (auto& character : characters)
         {
-            if (!character->isAlive)
+            if (!character.second->isAlive)
                 continue;
 
-            if (character->dayActionParametersCount == 0)
+            if (character.second->dayActionParametersCount == 0)
             {
-                character->dayAction();
+                character.second->dayAction();
             }
-            else if (character->dayActionParametersCount == 1)
+            else if (character.second->dayActionParametersCount == 1)
             {
-                cout << "You are " << character->getName() << endl;
+                cout << "You are " << character.second->getName() << endl;
                 cout << "Enter the target's index for day action: ";
                 int targetIndex;
                 cin >> targetIndex;
-                character->dayAction(characters[targetIndex]);
+                character.second->dayAction(characters[targetIndex].second);
             }
             else
             {
@@ -106,35 +112,35 @@ public:
 
     void vote()
     {
-        for (Character *character : characters)
+        for (auto& character : characters)
         {
-            if (!character->isAlive)
+            if (!character.second->isAlive)
                 continue;
 
             cout << "Enter the target's index for voting: ";
             int targetIndex;
             cin >> targetIndex;
-            character->vote(characters[targetIndex]);
+            character.second->vote(characters[targetIndex].second);
         }
 
         int index = 0;
-        int maxVote = characters[0]->voteCount;
+        int maxVote = characters[0].second->voteCount;
         bool maxVoteUnique = true;
         for (int i = 1; i < n_players; i++)
         {
-            if (characters[i]->voteCount > maxVote)
+            if (characters[i].second->voteCount > maxVote)
             {
-                maxVote = characters[i]->voteCount;
+                maxVote = characters[i].second->voteCount;
                 index = i;
                 maxVoteUnique = true;
             }
-            else if (characters[i]->voteCount == maxVote)
+            else if (characters[i].second->voteCount == maxVote)
             {
                 maxVoteUnique = false;
             }
         }
         cout << (maxVoteUnique == true) << endl;
-        if (maxVoteUnique) {characters[index]->isAlive = false; cout << index << " " << characters[index]->getName() << endl;}
+        if (maxVoteUnique) {characters[index].second->isAlive = false; cout << index << " " << characters[index].second->getName() << endl;}
     }
 
     bool haveVillagerWon()
