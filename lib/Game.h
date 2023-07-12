@@ -7,6 +7,7 @@ private:
     int werewolfCount;              // Number of werewolves
     int villagerCount;              // Number of villagers
     vector<pair<int, Character *>> characters; // Stores the characters of the players
+    vector<int> playersId;
 
     void initializeCharacters()
     {
@@ -40,7 +41,7 @@ private:
     }
 
 public:
-    Game(int numPlayers) : n_players(numPlayers)
+    Game(vector<int> playersId) : n_players(playersId.size()), playersId(playersId)
     {
         // Initialize the characters based on the number of players
         initializeCharacters();
@@ -48,14 +49,17 @@ public:
 
     void status()
     {
-        cout << "\nSTATUS\n";
-        cout << "Werewolf " << werewolfCount << " VS " << villagerCount << " Villager" << endl;
-        cout << "Up-to-date list of characters:\n";
+        std::string status = "GAME STATUS\n";
+        status += "Werewolf " + std::to_string(werewolfCount) + " VS " + std::to_string(villagerCount) + " Villager\n";
+        status += "Up-to-date list of characters:\n";
         for (auto& character : characters)
         {
-            cout << "\t" << character.second->getName() << ((character.second->isAlive) ? " alive" : " dead") << endl;
+            status += "\t" + character.second->getName() + ((character.second->isAlive) ? " alive\n" : " dead\n");
         }
-        cout << "END STATUS\n";
+        status += "END STATUS\n";
+        for (auto id : playersId) {
+            write(id, status.c_str(), status.length());
+        }
     }
 
     void night()

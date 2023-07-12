@@ -73,8 +73,14 @@ public:
 
         isGameStarted = true;
 
+        // create a vector of players' id so that Game.h can send and message to them
+        std::vector<int> playersId;
+        for(auto kv : players) {
+            playersId.push_back(kv.first);
+        }
+
         // Create a Game instance and start the game
-        Game game(players.size());  // Assuming `Game` is defined and the constructor takes the number of players as an argument
+        Game game(playersId);  // Assuming `Game` is defined and the constructor takes the number of players as an argument
         // Perform any necessary game initialization here
 
         // Start the game loop or call the appropriate game methods
