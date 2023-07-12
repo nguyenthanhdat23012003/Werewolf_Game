@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "Character.h"
 
 class Game
@@ -11,17 +12,22 @@ private:
 
     void initializeCharacters()
     {
+        // Shuffle the playersId vector
+        srand(unsigned(time(NULL)));
+        random_shuffle(playersId.begin(), playersId.end());
+        int playerIdIndex = playersId.size() - 1;
+
         // Add the characters based on the number of players
         int numWerewolves = n_players / 3; // Assuming 1/3 of players are werewolves
         werewolfCount = numWerewolves;
         villagerCount = n_players - numWerewolves;
         int numSeers = 1; // Assuming there is only one seer
         int numVillagers = n_players - numWerewolves - numSeers;
-
         for (int i = 0; i < numWerewolves; i++)
         {
             pair<int, Character *> temp;
             temp.second = new Werewolf();
+            temp.first = playersId[playerIdIndex--];
             characters.push_back(temp);
         }
 
@@ -29,6 +35,7 @@ private:
         {
             pair<int, Character *> temp;
             temp.second = new Seer();
+            temp.first = playersId[playerIdIndex--];
             characters.push_back(temp);
         }
 
@@ -36,6 +43,7 @@ private:
         {
             pair<int, Character *> temp;
             temp.second = new Villager();
+            temp.first = playersId[playerIdIndex--];
             characters.push_back(temp);
         }
     }
