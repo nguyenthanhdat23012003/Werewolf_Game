@@ -96,9 +96,9 @@ public:
         }
 
         while (!game.haveWerewolfWon() && !game.haveVillagerWon()) {
-            game.night();  // Perform night actions
-            game.day();    // Perform day actions
-            game.vote();   // Perform voting
+            game.promptNight();  // Prompt players for night actions
+            game.promptDay();    // Prompt players for day actions
+            game.promptVote();   // Prompt players for voting
             game.status(); // Print the updated status
         }
 

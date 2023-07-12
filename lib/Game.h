@@ -70,7 +70,7 @@ public:
         }
     }
 
-    void night()
+    void promptNight()
     {
         for (auto& character : characters)
         {
@@ -83,20 +83,23 @@ public:
             }
             else if (character.second->nightActionParametersCount == 1)
             {
-                cout << "You are " << character.second->getName() << endl;
-                cout << "Enter the target's index for night action: ";
-                int targetIndex;
-                cin >> targetIndex;
-                character.second->nightAction(characters[targetIndex].second);
+                string response = "You are " + character.second->getName() + "\nEnter the target\'s index for night action: ";
+                write(character.first, response.c_str(), response.length());
+//                cout << "You are " << character.second->getName() << endl;
+//                cout << "Enter the target's index for night action: ";
+//                int targetIndex;
+//                cin >> targetIndex;
+//                character.second->nightAction(characters[targetIndex].second);
             }
             else
             {
-                cout << "Something wrong!\n";
+                string response = "Something wrong!\n";
+                write(character.first, response.c_str(), response.length());
             }
         }
     }
 
-    void day()
+    void promptDay()
     {
         for (auto& character : characters)
         {
@@ -109,30 +112,34 @@ public:
             }
             else if (character.second->dayActionParametersCount == 1)
             {
-                cout << "You are " << character.second->getName() << endl;
-                cout << "Enter the target's index for day action: ";
-                int targetIndex;
-                cin >> targetIndex;
-                character.second->dayAction(characters[targetIndex].second);
+                string response = "You are " + character.second->getName() + "\nEnter the target\'s index for day action: ";
+                write(character.first, response.c_str(), response.length());
+//                cout << "You are " << character.second->getName() << endl;
+//                cout << "Enter the target's index for day action: ";
+//                int targetIndex;
+//                cin >> targetIndex;
+//                character.second->dayAction(characters[targetIndex].second);
             }
             else
             {
-                cout << "Something wrong!\n";
+                string response = "Something wrong!\n";
+                write(character.first, response.c_str(), response.length());
             }
         }
     }
 
-    void vote()
+    void promptVote()
     {
         for (auto& character : characters)
         {
             if (!character.second->isAlive)
                 continue;
 
-            cout << "Enter the target's index for voting: ";
-            int targetIndex;
-            cin >> targetIndex;
-            character.second->vote(characters[targetIndex].second);
+            string response=  "Enter the target's index for voting: ";
+            write(character.first, response.c_str(), response.length());
+//            int targetIndex;
+//            cin >> targetIndex;
+//            character.second->vote(characters[targetIndex].second);
         }
 
         int index = 0;
@@ -151,8 +158,15 @@ public:
                 maxVoteUnique = false;
             }
         }
-        cout << (maxVoteUnique == true) << endl;
-        if (maxVoteUnique) {characters[index].second->isAlive = false; cout << index << " " << characters[index].second->getName() << endl;}
+        if (maxVoteUnique) {
+            characters[index].second->isAlive = false;
+            string response = "Player index " + index + " is hung by villagers!";
+            write(character.first, response.c_str(), response.length());
+        }
+        else {
+            string response = "Villagers couldn't decide!";
+            write(character.first, response.c_str(), response.length());
+        }
     }
 
     bool haveVillagerWon()
