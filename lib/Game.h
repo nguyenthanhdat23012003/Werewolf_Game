@@ -160,12 +160,12 @@ public:
         }
         if (maxVoteUnique) {
             characters[index].second->isAlive = false;
-            string response = "Player index " + index + " is hung by villagers!";
-            write(character.first, response.c_str(), response.length());
+            string response = "Player index " + to_string(index) + " is hung by villagers!";
+            write(characters[index].first, response.c_str(), response.length());
         }
         else {
             string response = "Villagers couldn't decide!";
-            write(character.first, response.c_str(), response.length());
+            write(characters[index].first, response.c_str(), response.length());
         }
     }
 
