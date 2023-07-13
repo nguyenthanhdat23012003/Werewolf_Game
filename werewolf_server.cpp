@@ -230,20 +230,9 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
     cout << "In \'handleRequest\' funtction\n";
     cout << "Received body: " << request << endl;
     // Perform request handling based on the type of request
-    if (request.substr(0, 4) == "chat")
+    if (request == "")
     {
-        cout << "This is a chat request!\n";
-
-        // Send response to all clients
-        string response = getContentOfChatRequestBody(request);
-        cout << "Content: " << response << endl;
-        for (int i = 0; i < maxClients; i++)
-        {
-            if (clientSockets[i] != 0)
-            {
-                write(clientSockets[i], response.c_str(), response.length());
-            }
-        }
+        write(sd, "Blank request", strlen("Blank request"));
     }
     else if (request.substr(0, 3) == to_string(CommandMessage::NEW))
     {
@@ -349,9 +338,32 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
 
         write(sd, "You are not in any lobby", strlen("You are not in any lobby"));
     }
-    else if (request == "")
+    else if (request.substr(0, 3) == std::to_string(GameMessage::NIGHT_ACTION))
     {
-        write(sd, "Blank request", strlen("Blank request"));
+        write(sd, "You perform a night action", strlen("You perform a night action"));
+    }
+    else if (request.substr(0, 3) == std::to_string(GameMessage::DAY_ACTION))
+    {
+        write(sd, "You perform a day action", strlen("You perform a day action"));
+    }
+    else if (request.substr(0, 3) == std::to_string(GameMessage::VOTE))
+    {
+        write(sd, "Your turn to vote", strlen("Your turn to vote"));
+    }
+    else if (request.substr(0, 3) == to_string(GameMessage::CHAT))
+    {
+        cout << "This is a chat request!\n";
+
+        // Send response to all clients
+        string response = getContentOfChatRequestBody(request);
+        cout << "Content: " << response << endl;
+        for (int i = 0; i < maxClients; i++)
+        {
+            if (clientSockets[i] != 0)
+            {
+                write(clientSockets[i], response.c_str(), response.length());
+            }
+        }
     }
     else
     {
@@ -362,17 +374,11 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
 
 string getContentOfChatRequestBody(const std::string &body)
 {
-    // Find the position of the first occurrence of " chat "
-    size_t startPos = body.find("chat ");
-
-    // Check if " chat " is found
+    size_t startPos = body.find(to_string(GameMessage::CHAT));
     if (startPos != std::string::npos)
     {
-        // Get the substring starting from the position after " chat "
-        std::string content = body.substr(startPos + 5);
+        std::string content = body.substr(startPos + 4);
         return content;
     }
-
-    // If " chat " is not found, return an empty string
     return "";
 }
