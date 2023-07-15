@@ -227,6 +227,7 @@ void parseHTTPRequest(const char *httpRequest, int httpRequestLength, char *requ
 void handleRequest(const string &request, int sd, int *clientSockets, int maxClients)
 {
     static int clientIdCounter = 100;
+    static unordered_map<int, int> clientToLobbyMap;
     cout << "In \'handleRequest\' funtction\n";
     cout << "Received body: " << request << endl;
     // Perform request handling based on the type of request
@@ -245,6 +246,7 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
         lobby.addPlayer(sd); // Add the player to the lobby
         lobbies.push_back(lobby); // Add the created lobby to the lobbies vector
         int lobbyId = lobby.getId();
+        clientToLobbyMap[sd] = lobbyId; // Update the mapping
         write(sd, to_string(lobbyId).c_str(), to_string(lobbyId).length());
     }
     else if (request.substr(0, 3) == to_string(CommandMessage::JOIN))
@@ -282,6 +284,7 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
             {
                 // Lobby found, add the client to the lobby
                 it->addPlayer(sd);
+                clientToLobbyMap[sd] = lobbyId; // Update the mapping
                 write(sd, "Joined the lobby successfully", strlen("Joined the lobby successfully"));
             }
             else
@@ -303,6 +306,7 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
             if (lobby.hasPlayer(sd))
             {
                 lobby.removePlayer(sd);
+                clientToLobbyMap.erase(sd); // Remove the mapping
                 write(sd, "Left the lobby successfully", strlen("Left the lobby successfully"));
                 return;
             }
@@ -340,7 +344,18 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
     }
     else if (request.substr(0, 3) == std::to_string(GameMessage::NIGHT_ACTION))
     {
-        write(sd, "You perform a night action", strlen("You perform a night action"));
+        if (clientToLobbyMap.find(sd) != clientToLobbyMap.end()) {
+            write(sd, "You perform a night action", strlen("You perform a night action"));
+            string messageCode, targetIndexStr;
+            istringstream iss(request.substr(0));
+            iss >> messageCode >> targetIndexStr;
+            int targetIndex = atoi(targetIndexStr.c_str());
+            write(sd, targetIndexStr.c_str(), targetIndexStr.length());
+        }
+        else
+        {
+            write(sd, "Error: you are expected to be in a game", strlen("Error: you are expected to be in a game"));
+        }
     }
     else if (request.substr(0, 3) == std::to_string(GameMessage::DAY_ACTION))
     {

@@ -12,6 +12,7 @@ private:
     int id;
     std::unordered_map<int, PlayerStatus> players;  // Map to store player IDs and their status
     bool isGameStarted;
+    Game* game;  // Private property to store the Game object
 
 public:
     Lobby() {
@@ -79,14 +80,8 @@ public:
             playersId.push_back(kv.first);
         }
 
-        // Create a Game instance and start the game
-        Game game(playersId);  // Assuming `Game` is defined and the constructor takes the number of players as an argument
-        // Perform any necessary game initialization here
-
-        // Start the game loop or call the appropriate game methods
-
-        // Example:
-        game.status();  // Print the initial status
+        // Create a Game instance
+        game = new Game(playersId);
 
         // Send game start message to all players
         std::string startMessage = "The game has started!";
@@ -94,14 +89,40 @@ public:
             int playerId = player.first;
             write(playerId, startMessage.c_str(), startMessage.length());
         }
+    }
 
-        while (!game.haveWerewolfWon() && !game.haveVillagerWon()) {
-            game.promptNight();  // Prompt players for night actions
-            game.promptDay();    // Prompt players for day actions
-            game.promptVote();   // Prompt players for voting
-            game.status(); // Print the updated status
+    void sendGameStatus() {
+        if (isGameStarted) {
+            game->status();
+            return;
         }
+    }
 
-        // Game has ended, perform any necessary cleanup or post-game actions
+    void promtNight() {
+        if (isGameStarted) {
+            game->promptNight();
+            return;
+        }
+    }
+
+    void performNight(int fromId, int toIndex) {
+        if (isGameStarted) {
+            game->performNight(fromId, toIndex);
+            return;
+        }
+    }
+
+    void promptDay() {
+        if (isGameStarted) {
+            game->promptDay();
+            return;
+        }
+    }
+
+    void promptVote() {
+        if (isGameStarted) {
+            game->promptVote();
+            return;
+        }
     }
 };

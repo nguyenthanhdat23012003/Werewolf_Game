@@ -8,6 +8,7 @@ private:
     int werewolfCount;              // Number of werewolves
     int villagerCount;              // Number of villagers
     vector<pair<int, Character *>> characters; // Stores the characters of the players
+    unordered_map<int, Character*> idToCharacter;
     vector<int> playersId;
 
     void initializeCharacters()
@@ -29,6 +30,7 @@ private:
             temp.second = new Werewolf();
             temp.first = playersId[playerIdIndex--];
             characters.push_back(temp);
+            idToCharacter[temp.first] = temp.second; // Insert into the unordered_map
         }
 
         for (int i = 0; i < numSeers; i++)
@@ -37,6 +39,7 @@ private:
             temp.second = new Seer();
             temp.first = playersId[playerIdIndex--];
             characters.push_back(temp);
+            idToCharacter[temp.first] = temp.second; // Insert into the unordered_map
         }
 
         for (int i = 0; i < numVillagers; i++)
@@ -45,6 +48,7 @@ private:
             temp.second = new Villager();
             temp.first = playersId[playerIdIndex--];
             characters.push_back(temp);
+            idToCharacter[temp.first] = temp.second; // Insert into the unordered_map
         }
     }
 
@@ -177,5 +181,11 @@ public:
     bool haveWerewolfWon()
     {
         return werewolfCount >= villagerCount;
+    }
+
+    void performNight(int fromId, int toIndex) {
+        int paramsCount = idToCharacter[fromId]->nightActionParametersCount;
+        if (paramsCount == 0) idToCharacter[fromId]->nightAction();
+        else if (paramsCount == 1) idToCharacter[fromId]->nightAction(characters[toIndex].second);
     }
 };
