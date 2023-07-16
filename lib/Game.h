@@ -61,14 +61,16 @@ public:
 
     void status()
     {
-        std::string status = "GAME STATUS\n";
-        status += "Werewolf " + std::to_string(werewolfCount) + " VS " + std::to_string(villagerCount) + " Villager\n";
-        status += "Up-to-date list of characters:\n";
+        string status = "\n------------------------------\n";
+        status += "Index\tCharacter\tStatus\n";
+        int count = 0;
         for (auto& character : characters)
         {
-            status += "\t" + character.second->getName() + ((character.second->isAlive) ? " alive\n" : " dead\n");
+            string characterStatus = (character.second->isAlive) ? "Alive" : "Dead";
+            string row = to_string(count++) + "\t" + character.second->getName() + "\t" + characterStatus + "\n";
+            status += row;
         }
-        status += "END STATUS\n";
+        status += "------------------------------\n";
         for (auto id : playersId) {
             write(id, status.c_str(), status.length());
         }
@@ -186,6 +188,9 @@ public:
     void performNight(int fromId, int toIndex) {
         int paramsCount = idToCharacter[fromId]->nightActionParametersCount;
         if (paramsCount == 0) idToCharacter[fromId]->nightAction();
-        else if (paramsCount == 1) idToCharacter[fromId]->nightAction(characters[toIndex].second);
+        else if (paramsCount == 1) {
+            idToCharacter[fromId]->nightAction(characters[toIndex].second);
+            cout << characters[toIndex].second->getName() << " " << characters[toIndex].second->isAlive << endl;
+        }
     }
 };

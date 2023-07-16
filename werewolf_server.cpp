@@ -350,7 +350,13 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
             istringstream iss(request.substr(0));
             iss >> messageCode >> targetIndexStr;
             int targetIndex = atoi(targetIndexStr.c_str());
-            write(sd, targetIndexStr.c_str(), targetIndexStr.length());
+            int lobbyId = clientToLobbyMap[sd]; // Get the lobby ID for the player
+            for (Lobby& lobby : lobbies) {
+                if (lobby.getId() == lobbyId) {
+                    lobby.performNight(sd, targetIndex);
+                    break;
+                }
+            }
         }
         else
         {

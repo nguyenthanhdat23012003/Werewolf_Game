@@ -89,6 +89,11 @@ public:
             int playerId = player.first;
             write(playerId, startMessage.c_str(), startMessage.length());
         }
+
+        game->status();
+        game->promptNight();
+        this_thread::sleep_for(chrono::seconds(30)); // Delay for 30 seconds
+        game->status();
     }
 
     void sendGameStatus() {
