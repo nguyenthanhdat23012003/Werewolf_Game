@@ -90,10 +90,24 @@ public:
             write(playerId, startMessage.c_str(), startMessage.length());
         }
 
-        game->status();
-        game->promptNight();
-        this_thread::sleep_for(chrono::seconds(30)); // Delay for 30 seconds
-        game->status();
+        do {
+            game->status();
+            game->promptNight();
+            this_thread::sleep_for(chrono::seconds(30)); // Delay for 30 seconds
+            game->status();
+            game->promptDay();
+            this_thread::sleep_for(chrono::seconds(30));
+            game->status();
+            game->promptVote();
+            this_thread::sleep_for(chrono::seconds(30));
+            game->status();
+        } while (game->haveVillagerWon() || game->haveWerewolfWon());
+
+        string endMessage = "End game";
+        for (const auto& player : players) {
+            int playerId = player.first;
+            write(playerId, endMessage.c_str(), endMessage.length());
+        }
     }
 
     void sendGameStatus() {
@@ -124,9 +138,23 @@ public:
         }
     }
 
+    void performDay(int fromId, int toIndex) {
+        if (isGameStarted) {
+            game->performDay(fromId, toIndex);
+            return;
+        }
+    }
+
     void promptVote() {
         if (isGameStarted) {
             game->promptVote();
+            return;
+        }
+    }
+
+    void performVote(int fromId, int toIndex) {
+        if (isGameStarted) {
+            game->performVote(fromId, toIndex);
             return;
         }
     }

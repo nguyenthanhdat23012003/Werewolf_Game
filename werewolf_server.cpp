@@ -365,11 +365,45 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
     }
     else if (request.substr(0, 3) == std::to_string(GameMessage::DAY_ACTION))
     {
-        write(sd, "You perform a day action", strlen("You perform a day action"));
+        if (clientToLobbyMap.find(sd) != clientToLobbyMap.end()) {
+            write(sd, "You perform a day action", strlen("You perform a day action"));
+            string messageCode, targetIndexStr;
+            istringstream iss(request.substr(0));
+            iss >> messageCode >> targetIndexStr;
+            int targetIndex = atoi(targetIndexStr.c_str());
+            int lobbyId = clientToLobbyMap[sd]; // Get the lobby ID for the player
+            for (Lobby& lobby : lobbies) {
+                if (lobby.getId() == lobbyId) {
+                    lobby.performDay(sd, targetIndex);
+                    break;
+                }
+            }
+        }
+        else
+        {
+            write(sd, "Error: you are expected to be in a game", strlen("Error: you are expected to be in a game"));
+        }
     }
     else if (request.substr(0, 3) == std::to_string(GameMessage::VOTE))
     {
-        write(sd, "Your turn to vote", strlen("Your turn to vote"));
+        if (clientToLobbyMap.find(sd) != clientToLobbyMap.end()) {
+            write(sd, "You voted", strlen("You voted"));
+            string messageCode, targetIndexStr;
+            istringstream iss(request.substr(0));
+            iss >> messageCode >> targetIndexStr;
+            int targetIndex = atoi(targetIndexStr.c_str());
+            int lobbyId = clientToLobbyMap[sd]; // Get the lobby ID for the player
+            for (Lobby& lobby : lobbies) {
+                if (lobby.getId() == lobbyId) {
+                    lobby.performVote(sd, targetIndex);
+                    break;
+                }
+            }
+        }
+        else
+        {
+            write(sd, "Error: you are expected to be in a game", strlen("Error: you are expected to be in a game"));
+        }
     }
     else if (request.substr(0, 3) == to_string(GameMessage::CHAT))
     {

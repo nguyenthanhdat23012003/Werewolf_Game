@@ -190,7 +190,18 @@ public:
         if (paramsCount == 0) idToCharacter[fromId]->nightAction();
         else if (paramsCount == 1) {
             idToCharacter[fromId]->nightAction(characters[toIndex].second);
-            cout << characters[toIndex].second->getName() << " " << characters[toIndex].second->isAlive << endl;
         }
+    }
+
+    void performDay(int fromId, int toIndex) {
+        int paramsCount = idToCharacter[fromId]->dayActionParametersCount;
+        if (paramsCount == 0) idToCharacter[fromId]->dayAction();
+        else if (paramsCount == 1) {
+            idToCharacter[fromId]->dayAction(characters[toIndex].second);
+        }
+    }
+
+    void performVote(int fromId, int toIndex) {
+        idToCharacter[fromId]->vote(characters[toIndex].second);
     }
 };
