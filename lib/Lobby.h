@@ -91,17 +91,17 @@ public:
         }
 
         do {
-            game->status();
-            game->promptNight();
+            sendGameStatus();
+            promptNight();
             this_thread::sleep_for(chrono::seconds(30)); // Delay for 30 seconds
-            game->status();
-            game->promptDay();
+//            game->status();
+//            game->promptDay();
+//            this_thread::sleep_for(chrono::seconds(30));
+            sendGameStatus();
+            promptVote();
             this_thread::sleep_for(chrono::seconds(30));
-            game->status();
-            game->promptVote();
-            this_thread::sleep_for(chrono::seconds(30));
-            game->status();
-        } while (game->haveVillagerWon() || game->haveWerewolfWon());
+            sendGameStatus();
+        } while (!game->haveVillagerWon() && !game->haveWerewolfWon());
 
         string endMessage = "End game";
         for (const auto& player : players) {
@@ -117,7 +117,7 @@ public:
         }
     }
 
-    void promtNight() {
+    void promptNight() {
         if (isGameStarted) {
             game->promptNight();
             return;

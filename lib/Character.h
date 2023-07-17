@@ -6,6 +6,7 @@ using namespace std;
 class Character
 {
 public:
+    int sd;
     bool isAlive;
     int voteCount;
     int nightActionParametersCount;
@@ -36,7 +37,7 @@ public:
 
     Werewolf() : Character(1, 0) {}
 
-    string getName() const
+    string getName() const override
     {
         return "Werewolf";
     }
@@ -69,7 +70,7 @@ class Seer final : public Character
 public:
     Seer() : Character(1, 0) {}
 
-    string getName() const
+    string getName() const override
     {
         return "Seer";
     }
@@ -108,7 +109,7 @@ class Villager final : public Character
 public:
     Villager() : Character(0, 0) {}
 
-    string getName() const
+    string getName() const override
     {
         return "Villager";
     }
