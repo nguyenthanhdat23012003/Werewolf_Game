@@ -6,7 +6,7 @@ private:
     int n_players;
     int werewolfCount;              // Number of werewolves
     int villagerCount;              // Number of villagers
-    vector <pair<int, Character *>> characters; // Stores the characters of the players
+    vector<Character *> characters; // Stores the characters of the players
     unordered_map<int, Character *> idToCharacter;
     vector<int> playersId;
 
@@ -23,27 +23,24 @@ private:
         int numSeers = 1; // Assuming there is only one seer
         int numVillagers = n_players - numWerewolves - numSeers;
         for (int i = 0; i < numWerewolves; i++) {
-            pair < int, Character * > temp;
-            temp.second = new Werewolf();
-            temp.first = playersId[playerIdIndex--];
+            Character* temp = new Werewolf();
+            temp->sd = playersId[playerIdIndex--];
             characters.push_back(temp);
-            idToCharacter[temp.first] = temp.second; // Insert into the unordered_map
+            idToCharacter[temp->sd] = temp;
         }
 
         for (int i = 0; i < numSeers; i++) {
-            pair < int, Character * > temp;
-            temp.second = new Seer();
-            temp.first = playersId[playerIdIndex--];
+            Character* temp = new Seer();
+            temp->sd = playersId[playerIdIndex--];
             characters.push_back(temp);
-            idToCharacter[temp.first] = temp.second; // Insert into the unordered_map
+            idToCharacter[temp->sd] = temp;
         }
 
         for (int i = 0; i < numVillagers; i++) {
-            pair < int, Character * > temp;
-            temp.second = new Villager();
-            temp.first = playersId[playerIdIndex--];
+            Character* temp = new Villager();
+            temp->sd = playersId[playerIdIndex--];
             characters.push_back(temp);
-            idToCharacter[temp.first] = temp.second; // Insert into the unordered_map
+            idToCharacter[temp->sd] = temp;
         }
     }
 
@@ -60,27 +57,27 @@ public:
         status += "Index\tCharacter\tStatus\n";
         int count = 0;
         for (auto &character: characters) {
-            string characterStatus = (character.second->isAlive) ? "Alive" : "Dead";
-            string row = to_string(count++) + "\t" + character.second->getName() + "\t" + characterStatus + "\n";
+            string characterStatus = (character->isAlive) ? "Alive" : "Dead";
+            string row = to_string(count++) + "\t" + character->getName() + "\t" + characterStatus + "\n";
             status += row;
         }
         status += "------------------------------\n";
-        for (auto id: playersId) {
-            write(id, status.c_str(), status.length());
+        for (auto &character: characters) {
+            write(character->sd, status.c_str(), status.length());
         }
     }
 
     void promptNight() {
         for (auto &character: characters) {
-            if (!character.second->isAlive)
+            if (!character->isAlive)
                 continue;
 
-            if (character.second->nightActionParametersCount == 0) {
-                character.second->nightAction();
-            } else if (character.second->nightActionParametersCount == 1) {
+            if (character->nightActionParametersCount == 0) {
+                character->nightAction();
+            } else if (character->nightActionParametersCount == 1) {
                 string response =
-                        "You are " + character.second->getName() + "\nEnter the target\'s index for night action: ";
-                write(character.first, response.c_str(), response.length());
+                        "You are " + character->getName() + "\nEnter the target\'s index for night action: ";
+                write(character->sd, response.c_str(), response.length());
 //                cout << "You are " << character.second->getName() << endl;
 //                cout << "Enter the target's index for night action: ";
 //                int targetIndex;
@@ -88,22 +85,22 @@ public:
 //                character.second->nightAction(characters[targetIndex].second);
             } else {
                 string response = "Something wrong!\n";
-                write(character.first, response.c_str(), response.length());
+                write(character->sd, response.c_str(), response.length());
             }
         }
     }
 
     void promptDay() {
         for (auto &character: characters) {
-            if (!character.second->isAlive)
+            if (!character->isAlive)
                 continue;
 
-            if (character.second->dayActionParametersCount == 0) {
-                character.second->dayAction();
-            } else if (character.second->dayActionParametersCount == 1) {
+            if (character->dayActionParametersCount == 0) {
+                character->dayAction();
+            } else if (character->dayActionParametersCount == 1) {
                 string response =
-                        "You are " + character.second->getName() + "\nEnter the target\'s index for day action: ";
-                write(character.first, response.c_str(), response.length());
+                        "You are " + character->getName() + "\nEnter the target\'s index for day action: ";
+                write(character->sd, response.c_str(), response.length());
 //                cout << "You are " << character.second->getName() << endl;
 //                cout << "Enter the target's index for day action: ";
 //                int targetIndex;
@@ -111,18 +108,18 @@ public:
 //                character.second->dayAction(characters[targetIndex].second);
             } else {
                 string response = "Something wrong!\n";
-                write(character.first, response.c_str(), response.length());
+                write(character->sd, response.c_str(), response.length());
             }
         }
     }
 
     void promptVote() {
         for (auto &character: characters) {
-            if (!character.second->isAlive)
+            if (!character->isAlive)
                 continue;
 
             string response = "Enter the target's index for voting: ";
-            write(character.first, response.c_str(), response.length());
+            write(character->sd, response.c_str(), response.length());
 //            int targetIndex;
 //            cin >> targetIndex;
 //            character.second->vote(characters[targetIndex].second);
@@ -131,24 +128,24 @@ public:
 
     void processVote() {
         int index = 0;
-        int maxVote = characters[0].second->voteCount;
+        int maxVote = characters[0]->voteCount;
         bool maxVoteUnique = true;
         for (int i = 1; i < n_players; i++) {
-            if (characters[i].second->voteCount > maxVote) {
-                maxVote = characters[i].second->voteCount;
+            if (characters[i]->voteCount > maxVote) {
+                maxVote = characters[i]->voteCount;
                 index = i;
                 maxVoteUnique = true;
-            } else if (characters[i].second->voteCount == maxVote) {
+            } else if (characters[i]->voteCount == maxVote) {
                 maxVoteUnique = false;
             }
         }
         if (maxVoteUnique) {
-            characters[index].second->isAlive = false;
+            characters[index]->isAlive = false;
             string response = "Player index " + to_string(index) + " is hung by villagers!";
-            write(characters[index].first, response.c_str(), response.length());
+            write(characters[index]->sd, response.c_str(), response.length());
         } else {
             string response = "Villagers couldn't decide!";
-            write(characters[index].first, response.c_str(), response.length());
+            write(characters[index]->sd, response.c_str(), response.length());
         }
     }
 
@@ -166,7 +163,7 @@ public:
         int paramsCount = idToCharacter[fromId]->nightActionParametersCount;
         if (paramsCount == 0) idToCharacter[fromId]->nightAction();
         else if (paramsCount == 1) {
-            idToCharacter[fromId]->nightAction(characters[toIndex].second);
+            idToCharacter[fromId]->nightAction(characters[toIndex]);
         }
     }
 
@@ -174,19 +171,19 @@ public:
         int paramsCount = idToCharacter[fromId]->dayActionParametersCount;
         if (paramsCount == 0) idToCharacter[fromId]->dayAction();
         else if (paramsCount == 1) {
-            idToCharacter[fromId]->dayAction(characters[toIndex].second);
+            idToCharacter[fromId]->dayAction(characters[toIndex]);
         }
     }
 
     void performVote(int fromId, int toIndex) {
-        idToCharacter[fromId]->vote(characters[toIndex].second);
+        idToCharacter[fromId]->vote(characters[toIndex]);
     }
 
     void updateCharactersCount() {
         int newWerewolfCount = 0, newVillagerCount = 0;
         for (auto& character : characters) {
-            if (character.second->isAlive) {
-                if (character.second->getName() == "werewolf") newWerewolfCount++;
+            if (character->isAlive) {
+                if (character->getName() == "Werewolf") newWerewolfCount++;
                 else newVillagerCount++;
             }
         }
