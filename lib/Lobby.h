@@ -100,8 +100,9 @@ public:
             sendGameStatus();
             promptVote();
             this_thread::sleep_for(chrono::seconds(30));
+            processVote();
             sendGameStatus();
-        } while (!game->haveVillagerWon() && !game->haveWerewolfWon());
+        } while (!isGameEnded());
 
         string endMessage = "End game";
         for (const auto& player : players) {
@@ -157,5 +158,16 @@ public:
             game->performVote(fromId, toIndex);
             return;
         }
+    }
+
+    void processVote() {
+       if (isGameStarted) {
+            game->processVote();
+            return;
+        }
+    }
+
+    bool isGameEnded() {
+        return game->haveVillagerWon() || game->haveWerewolfWon();
     }
 };
