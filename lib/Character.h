@@ -51,7 +51,9 @@ public:
     {
         cout << getName() << " performed night action!\n";
         target->isAlive = false;
-        cout << target->getName() << " was bite by Werewolf!\n";
+        string response = "Target was bite by you!\n";
+        write(this->sd, response.c_str(), response.length());
+
     }
 
     void dayAction() override
@@ -83,14 +85,8 @@ public:
     void nightAction(Character *target) override
     {
         cout << getName() << " performed night action!\n";
-        if (target->getName() == "Werewolf")
-        {
-            cout << "Target character is a Werewolf!\n";
-        }
-        else
-        {
-            cout << "Target character is not a Werewolf.\n";
-        }
+        string predictionMessage = "Target character is " + target->getName() + "\n";
+        write(this->sd, predictionMessage.c_str(), predictionMessage.length());
     }
 
     void dayAction() override

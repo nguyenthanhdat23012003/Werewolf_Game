@@ -54,6 +54,7 @@ public:
         updateCharactersCount();
         string status = "\n------------------------------\n";
         status += to_string(werewolfCount) + " werewolf " + to_string(villagerCount) + " villager\n";
+        status += "------------------------------\n";
         status += "Index\tCharacter\tStatus\n";
         int count = 0;
         for (auto &character: characters) {
@@ -62,8 +63,12 @@ public:
             status += row;
         }
         status += "------------------------------\n";
-        for (auto &character: characters) {
-            write(character->sd, status.c_str(), status.length());
+        string customizedStatus;
+        for (int i = 0; i < characters.size(); i++) {
+            customizedStatus = status;
+            customizedStatus += "Your index: " + to_string(i) + "\n";
+            customizedStatus += "------------------------------\n";
+            write(characters[i]->sd, customizedStatus.c_str(), customizedStatus.length());
         }
     }
 
