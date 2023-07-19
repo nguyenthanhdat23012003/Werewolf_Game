@@ -103,12 +103,7 @@ public:
             processVote();
             sendGameStatus();
         } while (!isGameEnded());
-
-        string endMessage = "End game";
-        for (const auto& player : players) {
-            int playerId = player.first;
-            write(playerId, endMessage.c_str(), endMessage.length());
-        }
+        endGame();
     }
 
     void sendGameStatus() {
@@ -169,5 +164,30 @@ public:
 
     bool isGameEnded() {
         return game->haveVillagerWon() || game->haveWerewolfWon();
+    }
+
+    void endGame() {
+        if (isGameStarted) {
+            // Send end game message to all players
+            std::string endMessage = "The game has ended!";
+            for (const auto& player : players) {
+                int playerId = player.first;
+                write(playerId, endMessage.c_str(), endMessage.length());
+            }
+
+            // Cleanup the game
+            if (game) {
+                delete game;
+                game = nullptr;
+            }
+
+            // Reset player statuses to NotReady
+            for (auto& player : players) {
+                player.second = PlayerStatus::NotReady;
+            }
+
+            // Reset the game started flag
+            isGameStarted = false;
+        }
     }
 };
