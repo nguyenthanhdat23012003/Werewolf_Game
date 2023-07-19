@@ -27,10 +27,12 @@ public:
 
     void addPlayer(int playerId) {
         players[playerId] = PlayerStatus::NotReady;  // New player is initially not ready
+        printLobby();
     }
 
     void removePlayer(int playerId) {
         players.erase(playerId);
+        printLobby();
     }
 
     bool hasPlayer(int playerId) const {
@@ -43,6 +45,36 @@ public:
 
     void setPlayerStatus(int playerId, PlayerStatus status) {
         players[playerId] = status;
+        printLobby();
+    }
+
+    void printLobby() const {
+        stringstream ss;
+
+        // Lobby ID
+        ss << "\n------------------------------\n";
+        ss << "Lobby ID: " << id << "\n";
+        ss << "------------------------------\n";
+        // Table of players (player ID, player status)
+        ss << "Players in Lobby:\n";
+        ss << "ID\tStatus\n";
+        for (const auto& player : players) {
+            ss << player.first << "\t";
+            if (player.second == PlayerStatus::NotReady) {
+                ss << "Not Ready";
+            } else {
+                ss << "Ready";
+            }
+            ss << "\n";
+        }
+        ss << "------------------------------\n";
+        // Send the message to all players in the Lobby
+        for (const auto& player : players) {
+            string message = ss.str();
+            int playerId = player.first;
+            message += "You are " + to_string(playerId) + "\n------------------------------\n";
+            write(playerId, message.c_str(), message.length());
+        }
     }
 
     bool isReadyToStartGame() const {
