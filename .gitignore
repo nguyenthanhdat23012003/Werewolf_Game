@@ -2,3 +2,4 @@ werewolf_client
 werewolf_server
 app
 .idea/
+obj/
