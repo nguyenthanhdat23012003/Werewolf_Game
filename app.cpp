@@ -5,6 +5,7 @@
 #include "lib/gui/GameState.h"
 #include "lib/gui/LobbyListState.h"
 #include "lib/gui/InLobbyState.h"
+#include "lib/gui/InGameState.h"
 
 using namespace std;
 
@@ -35,6 +36,7 @@ int main(int argc, char* argv[]) {
         // Create game states objects
         LobbyListState lobbyListState(gWindow, gFont);
         InLobbyState inLobbyState(gWindow, gFont);
+        InGameState inGameState(gWindow, gFont);
 
         while (!quit) {
             GameState::State currentState = GameState::getCurrentState();
@@ -47,6 +49,8 @@ int main(int argc, char* argv[]) {
                     lobbyListState.handleEvents(e);
                 } else if (currentState == GameState::State::IN_LOBBY) {
                     inLobbyState.handleEvents(e);
+                } else if (currentState == GameState::State::IN_GAME) {
+                    inGameState.handleEvents(e);
                 }
             }
 
@@ -55,6 +59,8 @@ int main(int argc, char* argv[]) {
                 lobbyListState.update();
             } else if (currentState == GameState::State::IN_LOBBY) {
                 inLobbyState.update();
+            } else if (currentState == GameState::State::IN_GAME) {
+                inGameState.update();
             }
 
             // Clear the screen
@@ -65,6 +71,8 @@ int main(int argc, char* argv[]) {
                 lobbyListState.render();
             } else if (currentState == GameState::State::IN_LOBBY) {
                 inLobbyState.render();
+            } else if (currentState == GameState::State::IN_GAME) {
+                inGameState.render();
             }
 
             SDL_UpdateWindowSurface(gWindow);

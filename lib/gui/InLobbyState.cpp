@@ -17,6 +17,7 @@ void InLobbyState::handleEvents(SDL_Event& e) {
         const SDL_Rect startButtonRect = { 1000, 550, 100, 30 };
         if (renderer.isPointInRect(mouseX, mouseY, startButtonRect)) {
             printf("Clicked on START button!\n");
+            GameState::setCurrentState(GameState::State::IN_GAME);
             // Perform actions when the "READY" button is clicked
         }
 

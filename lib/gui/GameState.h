@@ -7,7 +7,8 @@ class GameState {
 public:
     enum class State {
         LOBBY_LIST,
-        IN_LOBBY
+        IN_LOBBY,
+        IN_GAME
     };
 
     // Static getter method to get the current state
