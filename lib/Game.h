@@ -1,5 +1,8 @@
 #include <algorithm>
 #include "Character.h"
+#include "json-develop/single_include/nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 class Game {
 private:
@@ -52,23 +55,33 @@ public:
 
     void status() {
         updateCharactersCount();
-        string status = "\n------------------------------\n";
-        status += to_string(werewolfCount) + " werewolf " + to_string(villagerCount) + " villager\n";
-        status += "------------------------------\n";
-        status += "Index\tCharacter\tStatus\n";
-        int count = 0;
-        for (auto &character: characters) {
-            string characterStatus = (character->isAlive) ? "Alive" : "Dead";
-            string row = to_string(count++) + "\t" + character->getName() + "\t" + characterStatus + "\n";
-            status += row;
+
+        // Create a JSON object for the game status
+        json gameStatus;
+        gameStatus["from"] = 5; // Replace 5 with the correct "from" player ID
+        gameStatus["n_players"] = n_players;
+        gameStatus["isGameEnded"] = false;
+
+        // Create a JSON array for players
+        json playersJson = json::array();
+        for (auto& character : characters) {
+            json playerJson;
+            playerJson["id"] = character->sd;
+            playerJson["character"] = character->getName();
+            playerJson["isAlive"] = character->isAlive;
+            playerJson["voteCount"] = character->voteCount;
+            playersJson.push_back(playerJson);
         }
-        status += "------------------------------\n";
-        string customizedStatus;
-        for (int i = 0; i < characters.size(); i++) {
-            customizedStatus = status;
-            customizedStatus += "Your index: " + to_string(i) + "\n";
-            customizedStatus += "------------------------------\n";
-            write(characters[i]->sd, customizedStatus.c_str(), customizedStatus.length());
+        gameStatus["players"] = playersJson;
+
+        // Convert the JSON object to a string
+        std::string jsonStr = gameStatus.dump();
+
+        // Send the JSON string to all players
+        for (auto& character : characters) {
+            if (character->isAlive) {
+                write(character->sd, jsonStr.c_str(), jsonStr.length());
+            }
         }
     }
 

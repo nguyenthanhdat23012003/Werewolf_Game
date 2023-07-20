@@ -136,16 +136,17 @@ public:
         do {
             sendGameStatus();
             promptNight();
-            this_thread::sleep_for(chrono::seconds(30)); // Delay for 30 seconds
+            this_thread::sleep_for(chrono::seconds(10));
 //            game->status();
 //            game->promptDay();
 //            this_thread::sleep_for(chrono::seconds(30));
             sendGameStatus();
             promptVote();
-            this_thread::sleep_for(chrono::seconds(30));
+            this_thread::sleep_for(chrono::seconds(10));
             processVote();
             sendGameStatus();
         } while (!isGameEnded());
+        sendGameStatus();
         endGame();
     }
 
