@@ -18,7 +18,8 @@ void LobbyListState::handleEvents(SDL_Event& e) {
         for (int i = 0; i < lobbyData.size(); ++i) {
             const SDL_Rect joinButtonRect = { 600, 100 + i * 50, 100, 30 };
             if (renderer.isPointInRect(mouseX, mouseY, joinButtonRect)) {
-                printf("adu\n");
+                printf("Clicked on JOIN button!\n");
+                GameState::setCurrentState(GameState::State::IN_LOBBY);
                 break; // No need to check further, as we found the clicked join button
             }
         }
@@ -40,6 +41,7 @@ void LobbyListState::render() {
         renderer.drawText(lobbyData[i][0], 200, 100 + i * 50, 255, 255, 255);
         renderer.drawText(lobbyData[i][1], 400, 100 + i * 50, 255, 255, 255);
         renderer.drawRect(600, 100 + i * 50, 100, 30, 255, 255, 255);
+        renderer.drawText("JOIN", 600 + 20, 100 + i * 50, 0, 0, 0);
     }
 
     SDL_UpdateWindowSurface(renderer.getWindow());

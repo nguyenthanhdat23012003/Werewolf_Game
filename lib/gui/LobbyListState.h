@@ -6,6 +6,7 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_ttf.h"
 #include "SDLRenderer.h"
+#include "GameState.h"
 
 class LobbyListState {
 public:
