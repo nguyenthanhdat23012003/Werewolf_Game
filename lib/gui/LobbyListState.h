@@ -1,12 +1,19 @@
 #ifndef LOBBYLISTSTATE_H
 #define LOBBYLISTSTATE_H
 
+#include <iostream>
 #include <vector>
 #include <string>
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_ttf.h"
+#include "../json-develop/single_include/nlohmann/json.hpp"
+#include "../RequestHelper.h"
+#include "../Message.h"
 #include "SDLRenderer.h"
 #include "GameState.h"
+
+using namespace std;
+using json = nlohmann::json;
 
 class LobbyListState {
 public:
@@ -17,7 +24,8 @@ public:
 
 private:
     SDLRenderer renderer;
-    std::vector<std::vector<std::string>> lobbyData;
+    RequestHelper requestHelper;
+    json lobbyData;
 };
 
 #endif // LOBBYLISTSTATE_H
