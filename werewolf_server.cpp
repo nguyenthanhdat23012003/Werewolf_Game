@@ -16,11 +16,13 @@
 #include <vector>
 #include "lib/Message.h"
 #include "lib/Lobby.h"
+#include "lib/json-develop/single_include/nlohmann/json.hpp"
 
 #define MAX_CLIENTS 10
 #define BUFFER_SIZE 512
 
 using namespace std;
+using json = nlohmann::json;
 
 vector<Lobby> lobbies;
 
@@ -237,7 +239,24 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
     }
     else if (request.substr(0, 3) == to_string(CommandMessage::NEW))
     {
-        write(sd, to_string(sd).c_str(), to_string(sd).length());
+        // Create a JSON array for lobbies
+        json j = json::array();
+
+        // Iterate through lobbies and create JSON objects for each lobby
+        for (const Lobby &lobby : lobbies)
+        {
+            json lobbyJson;
+            lobbyJson["id"] = lobby.getId();
+            lobbyJson["size"] = lobby.getLobbySize();
+            lobbyJson["isGameStarted"] = lobby.getIsGameStarted();
+            j.push_back(lobbyJson);
+        }
+
+        // Convert the JSON array to a string
+        string jsonStr = j.dump();
+
+        // Send the JSON string as a response to the client
+        write(sd, jsonStr.c_str(), jsonStr.length());
         clientIdCounter++;
     }
     else if (request.substr(0, 3) == to_string(CommandMessage::CREATE))
@@ -245,9 +264,11 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
         Lobby lobby;
         lobby.addPlayer(sd); // Add the player to the lobby
         lobbies.push_back(lobby); // Add the created lobby to the lobbies vector
-        int lobbyId = lobby.getId();
-        clientToLobbyMap[sd] = lobbyId; // Update the mapping
-        write(sd, to_string(lobbyId).c_str(), to_string(lobbyId).length());
+        clientToLobbyMap[sd] = lobby.getId(); // Update the mapping
+        json lobbyJson = lobby.toJson();
+        lobbyJson["from"] = sd;
+        string lobbyInfo = lobbyJson.dump();
+        write(sd, lobbyInfo.c_str(), lobbyInfo.length());
     }
     else if (request.substr(0, 3) == to_string(CommandMessage::JOIN))
     {
@@ -285,7 +306,10 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
                 // Lobby found, add the client to the lobby
                 it->addPlayer(sd);
                 clientToLobbyMap[sd] = lobbyId; // Update the mapping
-                write(sd, "Joined the lobby successfully", strlen("Joined the lobby successfully"));
+                json lobbyJson = it->toJson();
+                lobbyJson["from"] = sd;
+                string lobbyInfo = lobbyJson.dump();
+                write(sd, lobbyInfo.c_str(), lobbyInfo.length());
             }
             else
             {
@@ -307,7 +331,17 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
             {
                 lobby.removePlayer(sd);
                 clientToLobbyMap.erase(sd); // Remove the mapping
-                write(sd, "Left the lobby successfully", strlen("Left the lobby successfully"));
+                json j = json::array();
+                for (const Lobby &lobby : lobbies)
+                {
+                    json lobbyJson;
+                    lobbyJson["id"] = lobby.getId();
+                    lobbyJson["size"] = lobby.getLobbySize();
+                    lobbyJson["isGameStarted"] = lobby.getIsGameStarted();
+                    j.push_back(lobbyJson);
+                }
+                string jsonStr = j.dump();
+                write(sd, jsonStr.c_str(), jsonStr.length());
                 return;
             }
         }
@@ -321,7 +355,10 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
             if (lobby.hasPlayer(sd))
             {
                 lobby.setPlayerStatus(sd, PlayerStatus::Ready);
-                write(sd, "Set ready status successfully", strlen("Set ready status successfully"));
+                json lobbyJson = lobby.toJson();
+                lobbyJson["from"] = sd;
+                string lobbyInfo = lobbyJson.dump();
+                write(sd, lobbyInfo.c_str(), lobbyInfo.length());
                 return;
             }
         }

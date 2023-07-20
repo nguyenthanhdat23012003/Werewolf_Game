@@ -1,6 +1,9 @@
 #include <vector>
 #include <unordered_map>
 #include "Game.h"
+#include "json-develop/single_include/nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 enum class PlayerStatus {
     NotReady,
@@ -23,6 +26,14 @@ public:
 
     int getId() const {
         return id;
+    }
+
+    int getLobbySize() const {
+        return players.size();
+    }
+
+    bool getIsGameStarted() const {
+        return isGameStarted;
     }
 
     void addPlayer(int playerId) {
@@ -221,5 +232,23 @@ public:
             // Reset the game started flag
             isGameStarted = false;
         }
+    }
+
+    // Method to convert the Lobby to a JSON object
+    json toJson() const {
+        json lobbyJson;
+        lobbyJson["isGameStarted"] = isGameStarted;
+
+        // Create a JSON array for players
+        json playersJson = json::array();
+        for (const auto& player : players) {
+            json playerJson;
+            playerJson["id"] = player.first;
+            playerJson["isReady"] = (player.second == PlayerStatus::Ready);
+            playersJson.push_back(playerJson);
+        }
+        lobbyJson["players"] = playersJson;
+
+        return lobbyJson;
     }
 };
