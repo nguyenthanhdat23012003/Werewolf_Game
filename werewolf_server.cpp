@@ -323,6 +323,13 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
             write(sd, "Invalid format", strlen("Invalid format"));
         }
     }
+    else if (request.substr(0, 3) == std::to_string(CommandMessage::IN_LOBBY)) {
+        int lobbyId = clientToLobbyMap[sd];
+        json lobbyJson = lobbies[lobbyId].toJson();
+        lobbyJson["from"] = sd;
+        string lobbyInfo = lobbyJson.dump();
+        write(sd, lobbyInfo.c_str(), lobbyInfo.length());
+    }
     else if (request.substr(0, 3) == std::to_string(CommandMessage::LEAVE))
     {
         for (Lobby &lobby : lobbies)

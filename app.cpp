@@ -24,6 +24,7 @@ SDL_Surface* gScreenSurface = nullptr;
 TTF_Font* gFont = nullptr;
 
 int main(int argc, char* argv[]) {
+    int frame = 0;
     if (!init()) {
         cout << "Failed to initialize!\n";
     }
@@ -39,6 +40,7 @@ int main(int argc, char* argv[]) {
         InGameState inGameState(gWindow, gFont);
 
         while (!quit) {
+            frame++;
             GameState::State currentState = GameState::getCurrentState();
             while (SDL_PollEvent(&e) != 0) {
                 if (e.type == SDL_QUIT) {
@@ -57,8 +59,9 @@ int main(int argc, char* argv[]) {
             // Update the current state
             if (currentState == GameState::State::LOBBY_LIST) {
                 lobbyListState.update();
-            } else if (currentState == GameState::State::IN_LOBBY) {
+            } else if (currentState == GameState::State::IN_LOBBY && frame%120==0) {
                 inLobbyState.update();
+                frame = 0;
             } else if (currentState == GameState::State::IN_GAME) {
                 inGameState.update();
             }

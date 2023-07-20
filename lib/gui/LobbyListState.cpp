@@ -21,7 +21,8 @@ void LobbyListState::handleEvents(SDL_Event& e) {
         for (int i = 0; i < lobbyData.size(); ++i) {
             const SDL_Rect joinButtonRect = { 600, 100 + i * 50, 100, 30 };
             if (renderer.isPointInRect(mouseX, mouseY, joinButtonRect)) {
-                printf("Clicked on JOIN button!\n");
+                cout <<"Clicked on JOIN button for Lobby ID: " << lobbyData[i]["id"] << endl;
+                requestHelper.sendRequest(to_string(CommandMessage::JOIN) + " " + to_string(lobbyData[i]["id"]));
                 GameState::setCurrentState(GameState::State::IN_LOBBY);
                 break; // No need to check further, as we found the clicked join button
             }
