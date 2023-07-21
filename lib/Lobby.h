@@ -79,13 +79,8 @@ public:
             ss << "\n";
         }
         ss << "------------------------------\n";
-        // Send the message to all players in the Lobby
-        for (const auto& player : players) {
-            string message = ss.str();
-            int playerId = player.first;
-            message += "You are " + to_string(playerId) + "\n------------------------------\n";
-            write(playerId, message.c_str(), message.length());
-        }
+        string message = ss.str();
+        cout << message;
     }
 
     bool isReadyToStartGame() const {

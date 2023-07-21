@@ -27,6 +27,8 @@ void InLobbyState::handleEvents(SDL_Event& e) {
         if (renderer.isPointInRect(mouseX, mouseY, readyButtonRect)) {
             printf("Clicked on READY button!\n");
             // Perform actions when the "READY" button is clicked
+            requestHelper->sendRequest(std::to_string(CommandMessage::READY));
+            firstRender = true;
         }
 
         // Check if the mouse click is within the "LEAVE" button

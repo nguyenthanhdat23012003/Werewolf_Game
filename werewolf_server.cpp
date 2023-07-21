@@ -350,20 +350,33 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
     }
     else if (request.substr(0, 3) == std::to_string(CommandMessage::READY))
     {
-        for (Lobby &lobby : lobbies)
-        {
-            if (lobby.hasPlayer(sd))
-            {
-                lobby.setPlayerStatus(sd, PlayerStatus::Ready);
-                json lobbyJson = lobby.toJson();
+        auto it = clientToLobbyMap.find(sd);
+        if (it != clientToLobbyMap.end()) {
+            int lobbyId = it->second;
+            Lobby* lobbyPtr = nullptr;
+            for (auto& l : lobbies) {
+                if (l.getId() == lobbyId) {
+                    lobbyPtr = &l; // Get the pointer to the actual Lobby object in the vector
+                    break;
+                }
+            }
+            if (lobbyPtr != nullptr) {
+                lobbyPtr->setPlayerStatus(sd, PlayerStatus::Ready); // Modify the player status using the pointer
+                json lobbyJson = lobbyPtr->toJson();
+                cout << lobbyId << endl;
                 lobbyJson["from"] = sd;
+                lobbyJson["message"] = "success";
                 string lobbyInfo = lobbyJson.dump();
                 write(sd, lobbyInfo.c_str(), lobbyInfo.length());
-                return;
+            } else {
+                json lobbyJson;
+                lobbyJson["from"] = sd;
+                lobbyJson["message"] = "failure";
+                string lobbyInfo = lobbyJson.dump();
+                write(sd, lobbyInfo.c_str(), lobbyInfo.length());
             }
         }
 
-        write(sd, "You are not in any lobby", strlen("You are not in any lobby"));
     }
     else if (request.substr(0, 3) == std::to_string(CommandMessage::START))
     {
