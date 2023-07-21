@@ -17,14 +17,14 @@ using json = nlohmann::json;
 
 class LobbyListState {
 public:
-    LobbyListState(SDL_Window* window, TTF_Font* font);
+    LobbyListState(SDL_Window* window, TTF_Font* font, RequestHelper* helper);
     void handleEvents(SDL_Event& e);
     void update();
     void render();
 
 private:
     SDLRenderer renderer;
-    RequestHelper requestHelper;
+    RequestHelper* requestHelper;
     json lobbyData;
 };
 

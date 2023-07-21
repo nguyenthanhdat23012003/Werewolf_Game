@@ -22,6 +22,7 @@ void close();
 SDL_Window* gWindow = nullptr;
 SDL_Surface* gScreenSurface = nullptr;
 TTF_Font* gFont = nullptr;
+RequestHelper* requestHelper = nullptr;
 
 int main(int argc, char* argv[]) {
     if (!init()) {
@@ -34,9 +35,9 @@ int main(int argc, char* argv[]) {
         SDL_Event e;
 
         // Create game states objects
-        LobbyListState lobbyListState(gWindow, gFont);
-        InLobbyState inLobbyState(gWindow, gFont);
-        InGameState inGameState(gWindow, gFont);
+        LobbyListState lobbyListState(gWindow, gFont, requestHelper);
+        InLobbyState inLobbyState(gWindow, gFont, requestHelper);
+        InGameState inGameState(gWindow, gFont, requestHelper);
 
         while (!quit) {
             GameState::State currentState = GameState::getCurrentState();
@@ -105,7 +106,7 @@ bool init() {
             gScreenSurface = SDL_GetWindowSurface(gWindow);
         }
     }
-
+    requestHelper = new RequestHelper;
     return success;
 }
 
@@ -121,4 +122,6 @@ void close() {
     gWindow = NULL;
 
     SDL_Quit();
+
+    delete requestHelper;
 }

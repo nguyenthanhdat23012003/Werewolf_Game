@@ -1,7 +1,7 @@
 #include "LobbyListState.h"
 
-LobbyListState::LobbyListState(SDL_Window* window, TTF_Font* font) : renderer(window, font) {
-    string response = requestHelper.sendRequest(to_string(CommandMessage::NEW));
+LobbyListState::LobbyListState(SDL_Window* window, TTF_Font* font, RequestHelper* helper) : renderer(window, font), requestHelper(helper) {
+    string response = requestHelper->sendRequest(to_string(CommandMessage::NEW));
     cout << response << endl;
     // Parse the JSON response
     try {
@@ -31,7 +31,7 @@ void LobbyListState::handleEvents(SDL_Event& e) {
         const SDL_Rect refreshButtonRect = { 1000, 600, 120, 30 };
         if (renderer.isPointInRect(mouseX, mouseY, refreshButtonRect)) {
             printf("Clicked on REFRESH button!\n");
-            string response = requestHelper.sendRequest(to_string(CommandMessage::NEW));
+            string response = requestHelper->sendRequest(to_string(CommandMessage::NEW));
             cout << response << endl;
             try {
                 json jsonData = json::parse(response);

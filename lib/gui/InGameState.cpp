@@ -1,6 +1,6 @@
 #include "InGameState.h"
 
-InGameState::InGameState(SDL_Window* window, TTF_Font* font) : renderer(window, font) {
+InGameState::InGameState(SDL_Window* window, TTF_Font* font, RequestHelper* helper) : renderer(window, font), requestHelper(helper) {
     // Initialize players data
     playersData = {
             { "1", "Werewolf", "Alive" },

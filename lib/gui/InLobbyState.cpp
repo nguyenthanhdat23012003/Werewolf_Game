@@ -1,6 +1,6 @@
 #include "InLobbyState.h"
 
-InLobbyState::InLobbyState(SDL_Window* window, TTF_Font* font) : renderer(window, font) {
+InLobbyState::InLobbyState(SDL_Window* window, TTF_Font* font, RequestHelper* helper) : renderer(window, font), requestHelper(helper) {
     // Initialize players data
     playersData = {
             { "1", "Ready" },
