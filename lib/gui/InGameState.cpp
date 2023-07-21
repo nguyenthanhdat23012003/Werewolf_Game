@@ -24,6 +24,9 @@ void InGameState::handleEvents(SDL_Event& e) {
                 if (renderer.isPointInRect(mouseX, mouseY, voteButtonRect)) {
                     std::cout <<"Clicked on VOTE button for player " << inGameData["players"][i]["id"] << std::endl;
                     // Perform actions when the "VOTE" button is clicked
+                    int playerId = inGameData["players"][i]["id"];
+                    std::string voteMessage = std::to_string(GameMessage::VOTE) + " " + std::to_string(playerId);
+                    std::string response = requestHelper->sendRequest(voteMessage);
                 }
             } else {
                 const SDL_Rect nightActionButtonRect = { 800, 100 + i * 50, 180, 30 };

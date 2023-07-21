@@ -219,11 +219,11 @@ public:
         return werewolfCount >= villagerCount;
     }
 
-    void performNight(int fromId, int toIndex) {
+    void performNight(int fromId, int toId) {
         int paramsCount = idToCharacter[fromId]->nightActionParametersCount;
         if (paramsCount == 0) idToCharacter[fromId]->nightAction();
         else if (paramsCount == 1) {
-            idToCharacter[fromId]->nightAction(characters[toIndex]);
+            idToCharacter[fromId]->nightAction(idToCharacter[toId]);
         }
     }
 
@@ -235,8 +235,8 @@ public:
         }
     }
 
-    void performVote(int fromId, int toIndex) {
-        idToCharacter[fromId]->vote(characters[toIndex]);
+    void performVote(int fromId, int toId) {
+        idToCharacter[fromId]->vote(idToCharacter[toId]);
     }
 
     void updateCharactersCount() {

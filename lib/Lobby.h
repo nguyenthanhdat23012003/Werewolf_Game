@@ -165,9 +165,9 @@ public:
         }
     }
 
-    void performNight(int fromId, int toIndex) {
+    void performNight(int fromId, int toId) {
         if (isGameStarted) {
-            game->performNight(fromId, toIndex);
+            game->performNight(fromId, toId);
             return;
         }
     }
@@ -193,9 +193,9 @@ public:
         }
     }
 
-    void performVote(int fromId, int toIndex) {
+    void performVote(int fromId, int toId) {
         if (isGameStarted) {
-            game->performVote(fromId, toIndex);
+            game->performVote(fromId, toId);
             return;
         }
     }

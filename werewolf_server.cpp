@@ -451,15 +451,21 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
     else if (request.substr(0, 3) == std::to_string(GameMessage::NIGHT_ACTION))
     {
         if (clientToLobbyMap.find(sd) != clientToLobbyMap.end()) {
-            write(sd, "You perform a night action", strlen("You perform a night action"));
-            string messageCode, targetIndexStr;
+            string messageCode, targetIdStr;
             istringstream iss(request.substr(0));
-            iss >> messageCode >> targetIndexStr;
-            int targetIndex = atoi(targetIndexStr.c_str());
+            iss >> messageCode >> targetIdStr;
+            int targetId = atoi(targetIdStr.c_str());
             int lobbyId = clientToLobbyMap[sd]; // Get the lobby ID for the player
             for (Lobby& lobby : lobbies) {
                 if (lobby.getId() == lobbyId) {
-                    lobby.performNight(sd, targetIndex);
+                    lobby.performNight(sd, targetId);
+
+                    json jsonResponse;
+                    jsonResponse["from"] = sd;
+                    jsonResponse["message"] = "success";
+                    string response = jsonResponse.dump();
+                    write(sd, response.c_str(), response.length());
+
                     break;
                 }
             }
@@ -494,14 +500,21 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
     {
         if (clientToLobbyMap.find(sd) != clientToLobbyMap.end()) {
             write(sd, "You voted", strlen("You voted"));
-            string messageCode, targetIndexStr;
+            string messageCode, targetIdStr;
             istringstream iss(request.substr(0));
-            iss >> messageCode >> targetIndexStr;
-            int targetIndex = atoi(targetIndexStr.c_str());
+            iss >> messageCode >> targetIdStr;
+            int targetId = atoi(targetIdStr.c_str());
             int lobbyId = clientToLobbyMap[sd]; // Get the lobby ID for the player
             for (Lobby& lobby : lobbies) {
                 if (lobby.getId() == lobbyId) {
-                    lobby.performVote(sd, targetIndex);
+                    lobby.performVote(sd, targetId);
+
+                    json jsonResponse;
+                    jsonResponse["from"] = sd;
+                    jsonResponse["message"] = "success";
+                    string response = jsonResponse.dump();
+                    write(sd, response.c_str(), response.length());
+
                     break;
                 }
             }
