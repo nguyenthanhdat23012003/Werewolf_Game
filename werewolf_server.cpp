@@ -426,6 +426,28 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
         }
         return;
     }
+    else if (request.substr(0, 3) == std::to_string(CommandMessage::IN_GAME))
+    {
+        auto it = clientToLobbyMap.find(sd);
+        if (it != clientToLobbyMap.end())
+        {
+            int lobbyId = it->second;
+            Lobby lobby;
+            for (auto l : lobbies) {
+                if (l.getId() == lobbyId) lobby = l;
+            }
+            lobby.sendGameStatusTo(sd);
+        }
+        else
+        {
+            json gameJson;
+            gameJson["from"] = sd;
+            gameJson["message"] = "failure";
+            string gameInfo = gameJson.dump();
+            write(sd, gameInfo.c_str(), gameInfo.length());
+        }
+        return;
+    }
     else if (request.substr(0, 3) == std::to_string(GameMessage::NIGHT_ACTION))
     {
         if (clientToLobbyMap.find(sd) != clientToLobbyMap.end()) {

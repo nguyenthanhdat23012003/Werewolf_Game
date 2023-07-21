@@ -9,6 +9,7 @@ private:
     int n_players;
     int werewolfCount;              // Number of werewolves
     int villagerCount;              // Number of villagers
+    bool isDay;
     vector<Character *> characters; // Stores the characters of the players
     unordered_map<int, Character *> idToCharacter;
     vector<int> playersId;
@@ -45,6 +46,8 @@ private:
             characters.push_back(temp);
             idToCharacter[temp->sd] = temp;
         }
+
+        isDay = false;
     }
 
 public:
@@ -62,6 +65,7 @@ public:
         gameStatus["n_players"] = n_players;
         gameStatus["isGameEnded"] = false;
         gameStatus["message"] = "success";
+        gameStatus["isDay"] = isDay;
 
         // Create a JSON array for players
         json playersJson = json::array();
@@ -86,6 +90,43 @@ public:
         }
     }
 
+    void statusTo(int sd) {
+        updateCharactersCount();
+
+        // Create a JSON object for the game status
+        json gameStatus;
+        gameStatus["from"] = 5; // Replace 5 with the correct "from" player ID
+        gameStatus["n_players"] = n_players;
+        gameStatus["isGameEnded"] = false;
+        gameStatus["message"] = "success";
+        gameStatus["isDay"] = isDay;
+
+        // Create a JSON array for players
+        json playersJson = json::array();
+        for (auto& character : characters) {
+            json playerJson;
+            playerJson["id"] = character->sd;
+            playerJson["character"] = character->getName();
+            playerJson["isAlive"] = character->isAlive;
+            playerJson["voteCount"] = character->voteCount;
+            playersJson.push_back(playerJson);
+        }
+        gameStatus["players"] = playersJson;
+
+        // Convert the JSON object to a string
+        std::string jsonStr = gameStatus.dump();
+
+        write(sd, jsonStr.c_str(), jsonStr.length());
+    }
+
+    bool getIsDay() {
+        return isDay;
+    }
+
+    void toggleIsDay() {
+        isDay = !isDay;
+    }
+
     void promptNight() {
 //        for (auto &character: characters) {
 //            if (!character->isAlive)
@@ -97,11 +138,11 @@ public:
 //                string response =
 //                        "You are " + character->getName() + "\nEnter the target\'s index for night action: ";
 //                write(character->sd, response.c_str(), response.length());
-////                cout << "You are " << character.second->getName() << endl;
-////                cout << "Enter the target's index for night action: ";
-////                int targetIndex;
-////                cin >> targetIndex;
-////                character.second->nightAction(characters[targetIndex].second);
+//                cout << "You are " << character.second->getName() << endl;
+//               cout << "Enter the target's index for night action: ";
+//               int targetIndex;
+//                cin >> targetIndex;
+//               character.second->nightAction(characters[targetIndex].second);
 //            } else {
 //                string response = "Something wrong!\n";
 //                write(character->sd, response.c_str(), response.length());
@@ -120,11 +161,11 @@ public:
 //                string response =
 //                        "You are " + character->getName() + "\nEnter the target\'s index for day action: ";
 //                write(character->sd, response.c_str(), response.length());
-////                cout << "You are " << character.second->getName() << endl;
-////                cout << "Enter the target's index for day action: ";
-////                int targetIndex;
-////                cin >> targetIndex;
-////                character.second->dayAction(characters[targetIndex].second);
+//                cout << "You are " << character.second->getName() << endl;
+//                cout << "Enter the target's index for day action: ";
+//                int targetIndex;
+//                cin >> targetIndex;
+//                character.second->dayAction(characters[targetIndex].second);
 //            } else {
 //                string response = "Something wrong!\n";
 //                write(character->sd, response.c_str(), response.length());
@@ -139,9 +180,9 @@ public:
 //
 //            string response = "Enter the target's index for voting: ";
 //            write(character->sd, response.c_str(), response.length());
-////            int targetIndex;
-////            cin >> targetIndex;
-////            character.second->vote(characters[targetIndex].second);
+//            int targetIndex;
+//            cin >> targetIndex;
+//            character.second->vote(characters[targetIndex].second);
 //        }
     }
 

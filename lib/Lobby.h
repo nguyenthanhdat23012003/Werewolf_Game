@@ -127,19 +127,18 @@ public:
 //            int playerId = player.first;
 //            write(playerId, startMessage.c_str(), startMessage.length());
 //        }
-
         do {
             sendGameStatus();
-            promptNight();
-            this_thread::sleep_for(chrono::seconds(10));
+//            promptNight();
+            this_thread::sleep_for(chrono::seconds(30));
 //            game->status();
 //            game->promptDay();
 //            this_thread::sleep_for(chrono::seconds(30));
-            sendGameStatus();
-            promptVote();
-            this_thread::sleep_for(chrono::seconds(10));
-            processVote();
-            sendGameStatus();
+//            sendGameStatus();
+//            promptVote();
+//            this_thread::sleep_for(chrono::seconds(10));
+            if (game->getIsDay()) processVote();
+//            sendGameStatus();
         } while (!isGameEnded());
         sendGameStatus();
         endGame();
@@ -148,6 +147,13 @@ public:
     void sendGameStatus() {
         if (isGameStarted) {
             game->status();
+            return;
+        }
+    }
+
+    void sendGameStatusTo(int sd) {
+        if (isGameStarted) {
+            game->statusTo(sd);
             return;
         }
     }

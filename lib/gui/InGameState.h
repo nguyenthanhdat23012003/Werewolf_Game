@@ -4,7 +4,12 @@
 #include "SDLRenderer.h"
 #include "../RequestHelper.h"
 #include <vector>
+#include <iostream>
 #include <string>
+#include "../json-develop/single_include/nlohmann/json.hpp"
+#include "../Message.h"
+
+using json = nlohmann::json;
 
 class InGameState {
 public:
@@ -17,8 +22,9 @@ public:
 private:
     SDLRenderer renderer;
     RequestHelper* requestHelper;
-    std::vector<std::vector<std::string>> playersData;
-    std::string currentTimeData;
+    json inGameData;
+    bool isDay;
+    bool firstRender;
 };
 
 #endif // INGAMESTATE_H
