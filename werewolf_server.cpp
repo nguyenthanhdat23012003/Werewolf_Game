@@ -379,6 +379,33 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
 
         write(sd, "You are not in any lobby", strlen("You are not in any lobby"));
     }
+    else if (request.substr(0, 3) == std::to_string(CommandMessage::IN_LOBBY))
+    {
+        auto it = clientToLobbyMap.find(sd);
+        if (it != clientToLobbyMap.end())
+        {
+            int lobbyId = it->second;
+            Lobby lobby;
+            for (auto l : lobbies) {
+                if (l.getId() == lobbyId) lobby = l;
+            }
+            json lobbyJson = lobby.toJson();
+            cout << lobbyId << endl;
+            lobbyJson["from"] = sd;
+            lobbyJson["message"] = "success";
+            string lobbyInfo = lobbyJson.dump();
+            write(sd, lobbyInfo.c_str(), lobbyInfo.length());
+        }
+        else
+        {
+            json lobbyJson;
+            lobbyJson["from"] = sd;
+            lobbyJson["message"] = "failure";
+            string lobbyInfo = lobbyJson.dump();
+            write(sd, lobbyInfo.c_str(), lobbyInfo.length());
+        }
+        return;
+    }
     else if (request.substr(0, 3) == std::to_string(GameMessage::NIGHT_ACTION))
     {
         if (clientToLobbyMap.find(sd) != clientToLobbyMap.end()) {

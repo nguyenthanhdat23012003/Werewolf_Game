@@ -2,11 +2,12 @@
 
 InLobbyState::InLobbyState(SDL_Window* window, TTF_Font* font, RequestHelper* helper) : renderer(window, font), requestHelper(helper) {
     // Initialize players data
-    playersData = {
+    inLobbyData = {
             { "1", "Ready" },
             { "2", "Not Ready" },
             // Add more players data as needed
     };
+    firstRender = true;
 }
 
 void InLobbyState::handleEvents(SDL_Event& e) {
@@ -42,15 +43,35 @@ void InLobbyState::update() {
 }
 
 void InLobbyState::render() {
+    if (firstRender) {
+        std::string response = requestHelper->sendRequest(std::to_string(CommandMessage::IN_LOBBY));
+        std::cout << response << std::endl;
+        try {
+            json jsonData = json::parse(response);
+            inLobbyData = jsonData;
+        } catch (const json::exception& e) {
+            std::cerr << "Failed to parse JSON response: " << e.what() << std::endl;
+        }
+
+        firstRender = false;
+    }
+
     // Draw the players table in lobby
     // Draw table header
     renderer.drawText("ID", 200, 50, 255, 255, 255);
     renderer.drawText("Status", 400, 50, 255, 255, 255);
 
     // Draw table data
-    for (int i = 0; i < playersData.size(); ++i) {
-        renderer.drawText(playersData[i][0], 200, 100 + i * 50, 255, 255, 255);
-        renderer.drawText(playersData[i][1], 400, 100 + i * 50, 255, 255, 255);
+    for (int i = 0; i < inLobbyData["players"].size(); ++i) {
+        // Access the "id" and "isReady" fields from the JSON object
+        int id = inLobbyData["players"][i]["id"];
+        bool isReady = inLobbyData["players"][i]["isReady"];
+
+        // Convert the bool to a string to display in the table
+        std::string status = isReady ? "Ready" : "Not Ready";
+
+        renderer.drawText(std::to_string(id), 200, 100 + i * 50, 255, 255, 255);
+        renderer.drawText(status, 400, 100 + i * 50, 255, 255, 255);
     }
 
     // Draw LEAVE and READY buttons
