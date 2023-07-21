@@ -384,8 +384,15 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
         {
             if (lobby.hasPlayer(sd))
             {
+                if (!lobby.isReadyToStartGame()) {
+                    json responseJson;
+                    responseJson["from"] = sd;
+                    responseJson["message"] = "failure";
+                    string response = responseJson.dump();
+                    write(sd, response.c_str(), response.length());
+                    return;
+                }
                 lobby.startGame();
-                // Additional handling for starting the game, if needed
                 return;
             }
         }

@@ -2,11 +2,7 @@
 
 InLobbyState::InLobbyState(SDL_Window* window, TTF_Font* font, RequestHelper* helper) : renderer(window, font), requestHelper(helper) {
     // Initialize players data
-    inLobbyData = {
-            { "1", "Ready" },
-            { "2", "Not Ready" },
-            // Add more players data as needed
-    };
+    inLobbyData = nullptr;
     firstRender = true;
 }
 
@@ -14,12 +10,16 @@ void InLobbyState::handleEvents(SDL_Event& e) {
     if (e.type == SDL_MOUSEBUTTONDOWN) {
         int mouseX = e.button.x;
         int mouseY = e.button.y;
-        // Check if the mouse click is within the "READY" button
+        // Check if the mouse click is within the "START" button
         const SDL_Rect startButtonRect = { 1000, 550, 100, 30 };
         if (renderer.isPointInRect(mouseX, mouseY, startButtonRect)) {
             printf("Clicked on START button!\n");
-            GameState::setCurrentState(GameState::State::IN_GAME);
-            // Perform actions when the "READY" button is clicked
+            std::string response = requestHelper->sendRequest(std::to_string(CommandMessage::START));
+            std::cout << response << std::endl;
+            json jsonData = json::parse(response);
+            if (jsonData["message"] == "success")
+                GameState::setCurrentState(GameState::State::IN_GAME);
+            // Perform actions when the "START" button is clicked
         }
 
         // Check if the mouse click is within the "READY" button

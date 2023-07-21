@@ -122,11 +122,11 @@ public:
         game = new Game(playersId);
 
         // Send game start message to all players
-        std::string startMessage = "The game has started!";
-        for (const auto& player : players) {
-            int playerId = player.first;
-            write(playerId, startMessage.c_str(), startMessage.length());
-        }
+//        std::string startMessage = "The game has started!";
+//        for (const auto& player : players) {
+//            int playerId = player.first;
+//            write(playerId, startMessage.c_str(), startMessage.length());
+//        }
 
         do {
             sendGameStatus();

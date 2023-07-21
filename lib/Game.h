@@ -61,6 +61,7 @@ public:
         gameStatus["from"] = 5; // Replace 5 with the correct "from" player ID
         gameStatus["n_players"] = n_players;
         gameStatus["isGameEnded"] = false;
+        gameStatus["message"] = "success";
 
         // Create a JSON array for players
         json playersJson = json::array();
@@ -86,62 +87,62 @@ public:
     }
 
     void promptNight() {
-        for (auto &character: characters) {
-            if (!character->isAlive)
-                continue;
-
-            if (character->nightActionParametersCount == 0) {
-                character->nightAction();
-            } else if (character->nightActionParametersCount == 1) {
-                string response =
-                        "You are " + character->getName() + "\nEnter the target\'s index for night action: ";
-                write(character->sd, response.c_str(), response.length());
-//                cout << "You are " << character.second->getName() << endl;
-//                cout << "Enter the target's index for night action: ";
-//                int targetIndex;
-//                cin >> targetIndex;
-//                character.second->nightAction(characters[targetIndex].second);
-            } else {
-                string response = "Something wrong!\n";
-                write(character->sd, response.c_str(), response.length());
-            }
-        }
+//        for (auto &character: characters) {
+//            if (!character->isAlive)
+//                continue;
+//
+//            if (character->nightActionParametersCount == 0) {
+//                character->nightAction();
+//            } else if (character->nightActionParametersCount == 1) {
+//                string response =
+//                        "You are " + character->getName() + "\nEnter the target\'s index for night action: ";
+//                write(character->sd, response.c_str(), response.length());
+////                cout << "You are " << character.second->getName() << endl;
+////                cout << "Enter the target's index for night action: ";
+////                int targetIndex;
+////                cin >> targetIndex;
+////                character.second->nightAction(characters[targetIndex].second);
+//            } else {
+//                string response = "Something wrong!\n";
+//                write(character->sd, response.c_str(), response.length());
+//            }
+//        }
     }
 
     void promptDay() {
-        for (auto &character: characters) {
-            if (!character->isAlive)
-                continue;
-
-            if (character->dayActionParametersCount == 0) {
-                character->dayAction();
-            } else if (character->dayActionParametersCount == 1) {
-                string response =
-                        "You are " + character->getName() + "\nEnter the target\'s index for day action: ";
-                write(character->sd, response.c_str(), response.length());
-//                cout << "You are " << character.second->getName() << endl;
-//                cout << "Enter the target's index for day action: ";
-//                int targetIndex;
-//                cin >> targetIndex;
-//                character.second->dayAction(characters[targetIndex].second);
-            } else {
-                string response = "Something wrong!\n";
-                write(character->sd, response.c_str(), response.length());
-            }
-        }
+//        for (auto &character: characters) {
+//            if (!character->isAlive)
+//                continue;
+//
+//            if (character->dayActionParametersCount == 0) {
+//                character->dayAction();
+//            } else if (character->dayActionParametersCount == 1) {
+//                string response =
+//                        "You are " + character->getName() + "\nEnter the target\'s index for day action: ";
+//                write(character->sd, response.c_str(), response.length());
+////                cout << "You are " << character.second->getName() << endl;
+////                cout << "Enter the target's index for day action: ";
+////                int targetIndex;
+////                cin >> targetIndex;
+////                character.second->dayAction(characters[targetIndex].second);
+//            } else {
+//                string response = "Something wrong!\n";
+//                write(character->sd, response.c_str(), response.length());
+//            }
+//        }
     }
 
     void promptVote() {
-        for (auto &character: characters) {
-            if (!character->isAlive)
-                continue;
-
-            string response = "Enter the target's index for voting: ";
-            write(character->sd, response.c_str(), response.length());
-//            int targetIndex;
-//            cin >> targetIndex;
-//            character.second->vote(characters[targetIndex].second);
-        }
+//        for (auto &character: characters) {
+//            if (!character->isAlive)
+//                continue;
+//
+//            string response = "Enter the target's index for voting: ";
+//            write(character->sd, response.c_str(), response.length());
+////            int targetIndex;
+////            cin >> targetIndex;
+////            character.second->vote(characters[targetIndex].second);
+//        }
     }
 
     void processVote() {
@@ -159,11 +160,11 @@ public:
         }
         if (maxVoteUnique) {
             characters[index]->isAlive = false;
-            string response = "Player index " + to_string(index) + " is hung by villagers!";
-            write(characters[index]->sd, response.c_str(), response.length());
+//            string response = "Player index " + to_string(index) + " is hung by villagers!";
+//            write(characters[index]->sd, response.c_str(), response.length());
         } else {
-            string response = "Villagers couldn't decide!";
-            write(characters[index]->sd, response.c_str(), response.length());
+//            string response = "Villagers couldn't decide!";
+//            write(characters[index]->sd, response.c_str(), response.length());
         }
     }
 

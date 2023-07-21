@@ -51,8 +51,8 @@ public:
     {
         cout << getName() << " performed night action!\n";
         target->isAlive = false;
-        string response = "Target was bite by you!\n";
-        write(this->sd, response.c_str(), response.length());
+//        string response = "Target was bite by you!\n";
+//        write(this->sd, response.c_str(), response.length());
 
     }
 
@@ -85,8 +85,8 @@ public:
     void nightAction(Character *target) override
     {
         cout << getName() << " performed night action!\n";
-        string predictionMessage = "Target character is " + target->getName() + "\n";
-        write(this->sd, predictionMessage.c_str(), predictionMessage.length());
+//        string predictionMessage = "Target character is " + target->getName() + "\n";
+//        write(this->sd, predictionMessage.c_str(), predictionMessage.length());
     }
 
     void dayAction() override
