@@ -1,3 +1,4 @@
+#pragma GCC diagnostic ignored "-Wsign-compare"
 #include "InLobbyState.h"
 
 InLobbyState::InLobbyState(SDL_Window* window, TTF_Font* font, RequestHelper* helper) : renderer(window, font), requestHelper(helper) {
