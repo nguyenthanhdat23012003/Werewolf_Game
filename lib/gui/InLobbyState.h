@@ -26,6 +26,8 @@ private:
     json inLobbyData;
     RequestHelper* requestHelper;
     bool firstRender;
+    Uint32 lastUpdateTime;
+    const Uint32 UPDATE_INTERVAL = 1000;
 };
 
 #endif // INLOBBYSTATE_H

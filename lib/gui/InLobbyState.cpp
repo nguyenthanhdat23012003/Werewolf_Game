@@ -5,6 +5,7 @@ InLobbyState::InLobbyState(SDL_Window* window, TTF_Font* font, RequestHelper* he
     // Initialize players data
     inLobbyData = nullptr;
     firstRender = true;
+    lastUpdateTime = SDL_GetTicks();
 }
 
 void InLobbyState::handleEvents(SDL_Event& e) {
@@ -43,7 +44,22 @@ void InLobbyState::handleEvents(SDL_Event& e) {
 }
 
 void InLobbyState::update() {
-    // Update the state if needed
+    if (firstRender) return;
+    Uint32 currentTime = SDL_GetTicks();
+    if (currentTime - lastUpdateTime >= UPDATE_INTERVAL) {
+        std::string response = requestHelper->sendRequest(std::to_string(CommandMessage::IN_LOBBY));
+        std::cout << response << std::endl;
+        try {
+            json jsonData = json::parse(response);
+            inLobbyData = jsonData;
+            if (inLobbyData["isGameStarted"] == true) {
+                GameState::setCurrentState(GameState::State::IN_GAME);
+            }
+            lastUpdateTime = currentTime;
+        } catch (const json::exception& e) {
+            std::cerr << "Failed to parse JSON response: " << e.what() << std::endl;
+        }
+    }
 }
 
 void InLobbyState::render() {

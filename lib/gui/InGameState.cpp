@@ -3,11 +3,7 @@
 
 InGameState::InGameState(SDL_Window* window, TTF_Font* font, RequestHelper* helper) : renderer(window, font), requestHelper(helper) {
     // Initialize players data
-    inGameData = {
-            { "1", "Werewolf", "Alive" },
-            { "2", "Villager", "Dead" },
-            // Add more players data as needed
-    };
+    inGameData = nullptr;
 
     isDay = false; // Set initial time data to "day"
     firstRender = true;
@@ -43,6 +39,8 @@ void InGameState::handleEvents(SDL_Event& e) {
 
 
 void InGameState::update() {
+    if (firstRender || inGameData["isGameEnded"] == true) return;
+
     Uint32 currentTime = SDL_GetTicks();
 
     if (currentTime - lastDayChangeTime >= DAY_CHANGE_INTERVAL) {
@@ -101,13 +99,12 @@ void InGameState::render() {
             renderer.drawRect(800, 100 + (index - 1) * 50, 180, 30, 255, 255, 255);
             renderer.drawText("NIGHT ACTION", 800 + 10, 100 + (index - 1) * 50, 0, 0, 0);
         }
-
-        if (inGameData["isGameEnded"]) {
-            renderer.drawRect(1280/2-100, 720/2-10, 200, 30, 255, 255, 255);
-            renderer.drawText("GAME END!", 1280/2-80, 720/2-10, 0, 0, 0);
-        }
-
         index++;
+    }
+
+    if (inGameData["isGameEnded"]) {
+        renderer.drawRect(1280/2-100, 720/2-10, 200, 30, 255, 255, 255);
+        renderer.drawText("GAME END!", 1280/2-80, 720/2-10, 0, 0, 0);
     }
 
     // Update the window surface
