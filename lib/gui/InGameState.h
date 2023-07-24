@@ -25,6 +25,8 @@ private:
     json inGameData;
     bool isDay;
     bool firstRender;
+    Uint32 lastDayChangeTime;
+    const Uint32 DAY_CHANGE_INTERVAL = 10000;
 };
 
 #endif // INGAMESTATE_H

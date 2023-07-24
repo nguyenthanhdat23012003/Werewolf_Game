@@ -38,12 +38,10 @@ public:
 
     void addPlayer(int playerId) {
         players[playerId] = PlayerStatus::NotReady;  // New player is initially not ready
-        printLobby();
     }
 
     void removePlayer(int playerId) {
         players.erase(playerId);
-        printLobby();
     }
 
     bool hasPlayer(int playerId) const {
@@ -56,31 +54,6 @@ public:
 
     void setPlayerStatus(int playerId, PlayerStatus status) {
         players[playerId] = status;
-        printLobby();
-    }
-
-    void printLobby() const {
-        stringstream ss;
-
-        // Lobby ID
-        ss << "\n------------------------------\n";
-        ss << "Lobby ID: " << id << "\n";
-        ss << "------------------------------\n";
-        // Table of players (player ID, player status)
-        ss << "Players in Lobby:\n";
-        ss << "ID\tStatus\n";
-        for (const auto& player : players) {
-            ss << player.first << "\t";
-            if (player.second == PlayerStatus::NotReady) {
-                ss << "Not Ready";
-            } else {
-                ss << "Ready";
-            }
-            ss << "\n";
-        }
-        ss << "------------------------------\n";
-        string message = ss.str();
-        cout << message;
     }
 
     bool isReadyToStartGame() const {
@@ -109,13 +82,18 @@ public:
             // Not enough players or players not ready to start the game
             return;
         }
-
         isGameStarted = true;
 
         // create a vector of players' id so that Game.h can send and message to them
         std::vector<int> playersId;
         for(auto kv : players) {
             playersId.push_back(kv.first);
+        }
+
+        // Cleanup the old game
+        if (game) {
+            delete game;
+            game = nullptr;
         }
 
         // Create a Game instance
@@ -128,19 +106,11 @@ public:
 //            write(playerId, startMessage.c_str(), startMessage.length());
 //        }
         do {
-            sendGameStatus();
-//            promptNight();
-            this_thread::sleep_for(chrono::seconds(30));
-//            game->status();
-//            game->promptDay();
-//            this_thread::sleep_for(chrono::seconds(30));
-//            sendGameStatus();
-//            promptVote();
-//            this_thread::sleep_for(chrono::seconds(10));
+            this_thread::sleep_for(chrono::seconds(10));
             if (game->getIsDay()) processVote();
-//            sendGameStatus();
+            game->toggleIsDay();
         } while (!isGameEnded());
-        sendGameStatus();
+//        sendGameStatus();
         endGame();
     }
 
@@ -152,10 +122,7 @@ public:
     }
 
     void sendGameStatusTo(int sd) {
-        if (isGameStarted) {
             game->statusTo(sd);
-            return;
-        }
     }
 
     void promptNight() {
@@ -214,17 +181,12 @@ public:
     void endGame() {
         if (isGameStarted) {
             // Send end game message to all players
-            std::string endMessage = "The game has ended!";
-            for (const auto& player : players) {
-                int playerId = player.first;
-                write(playerId, endMessage.c_str(), endMessage.length());
-            }
+//            std::string endMessage = "The game has ended!";
+//            for (const auto& player : players) {
+//                int playerId = player.first;
+//                write(playerId, endMessage.c_str(), endMessage.length());
+//            }
 
-            // Cleanup the game
-            if (game) {
-                delete game;
-                game = nullptr;
-            }
 
             // Reset player statuses to NotReady
             for (auto& player : players) {

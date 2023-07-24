@@ -10,6 +10,7 @@ private:
     int werewolfCount;              // Number of werewolves
     int villagerCount;              // Number of villagers
     bool isDay;
+    bool isGameEnded;
     vector<Character *> characters; // Stores the characters of the players
     unordered_map<int, Character *> idToCharacter;
     vector<int> playersId;
@@ -48,6 +49,7 @@ private:
         }
 
         isDay = false;
+        isGameEnded = false;
     }
 
 public:
@@ -63,7 +65,7 @@ public:
         json gameStatus;
         gameStatus["from"] = 5; // Replace 5 with the correct "from" player ID
         gameStatus["n_players"] = n_players;
-        gameStatus["isGameEnded"] = false;
+        gameStatus["isGameEnded"] = isGameEnded;
         gameStatus["message"] = "success";
         gameStatus["isDay"] = isDay;
 
@@ -92,12 +94,11 @@ public:
 
     void statusTo(int sd) {
         updateCharactersCount();
-
         // Create a JSON object for the game status
         json gameStatus;
-        gameStatus["from"] = 5; // Replace 5 with the correct "from" player ID
+        gameStatus["from"] = sd; // Replace 5 with the correct "from" player ID
         gameStatus["n_players"] = n_players;
-        gameStatus["isGameEnded"] = false;
+        gameStatus["isGameEnded"] = isGameEnded;
         gameStatus["message"] = "success";
         gameStatus["isDay"] = isDay;
 
@@ -211,12 +212,14 @@ public:
 
     bool haveVillagerWon()
     {
-        return werewolfCount == 0;
+        isGameEnded = werewolfCount == 0;
+        return isGameEnded;
     }
 
     bool haveWerewolfWon()
     {
-        return werewolfCount >= villagerCount;
+        isGameEnded = werewolfCount >= villagerCount;
+        return isGameEnded;
     }
 
     void performNight(int fromId, int toId) {

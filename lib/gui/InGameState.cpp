@@ -11,6 +11,7 @@ InGameState::InGameState(SDL_Window* window, TTF_Font* font, RequestHelper* help
 
     isDay = false; // Set initial time data to "day"
     firstRender = true;
+    lastDayChangeTime = SDL_GetTicks();
 }
 
 void InGameState::handleEvents(SDL_Event& e) {
@@ -42,7 +43,23 @@ void InGameState::handleEvents(SDL_Event& e) {
 
 
 void InGameState::update() {
-    // Update the state if needed
+    Uint32 currentTime = SDL_GetTicks();
+
+    if (currentTime - lastDayChangeTime >= DAY_CHANGE_INTERVAL) {
+        std::string response = requestHelper->sendRequest(std::to_string(CommandMessage::IN_GAME));
+        std::cout << response << std::endl;
+        try {
+            json jsonData = json::parse(response);
+            inGameData = jsonData;
+            if (inGameData["isDay"] != isDay) {
+                std::cout << "Toggle\n";
+                isDay = !isDay; // Toggle the day state
+                lastDayChangeTime = currentTime; // Update the last day change time
+            }
+        } catch (const json::exception& e) {
+            std::cerr << "Failed to parse JSON response: " << e.what() << std::endl;
+        }
+    }
 }
 
 void InGameState::render() {
@@ -83,6 +100,11 @@ void InGameState::render() {
         } else {
             renderer.drawRect(800, 100 + (index - 1) * 50, 180, 30, 255, 255, 255);
             renderer.drawText("NIGHT ACTION", 800 + 10, 100 + (index - 1) * 50, 0, 0, 0);
+        }
+
+        if (inGameData["isGameEnded"]) {
+            renderer.drawRect(1280/2-100, 720/2-10, 200, 30, 255, 255, 255);
+            renderer.drawText("GAME END!", 1280/2-80, 720/2-10, 0, 0, 0);
         }
 
         index++;

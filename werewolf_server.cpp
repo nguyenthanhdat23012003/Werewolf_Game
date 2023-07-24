@@ -228,6 +228,9 @@ void parseHTTPRequest(const char *httpRequest, int httpRequestLength, char *requ
 
 void handleRequest(const string &request, int sd, int *clientSockets, int maxClients)
 {
+    for (auto lobby : lobbies) {
+        cout << ((lobby.toJson()).dump());
+    }
     static int clientIdCounter = 100;
     static unordered_map<int, int> clientToLobbyMap;
     cout << "In \'handleRequest\' funtction\n";
@@ -392,6 +395,11 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
                     write(sd, response.c_str(), response.length());
                     return;
                 }
+                json responseJson;
+                responseJson["from"] = sd;
+                responseJson["message"] = "success";
+                string response = responseJson.dump();
+                write(sd, response.c_str(), response.length());
                 lobby.startGame();
                 return;
             }
@@ -428,13 +436,14 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
     }
     else if (request.substr(0, 3) == std::to_string(CommandMessage::IN_GAME))
     {
+
         auto it = clientToLobbyMap.find(sd);
         if (it != clientToLobbyMap.end())
         {
             int lobbyId = it->second;
             Lobby lobby;
             for (auto l : lobbies) {
-                if (l.getId() == lobbyId) lobby = l;
+                if (l.getId() == lobbyId) {lobby = l; break;}
             }
             lobby.sendGameStatusTo(sd);
         }

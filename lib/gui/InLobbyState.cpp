@@ -16,6 +16,7 @@ void InLobbyState::handleEvents(SDL_Event& e) {
         if (renderer.isPointInRect(mouseX, mouseY, startButtonRect)) {
             printf("Clicked on START button!\n");
             std::string response = requestHelper->sendRequest(std::to_string(CommandMessage::START));
+            printf("Response received\n");
             std::cout << response << std::endl;
             json jsonData = json::parse(response);
             if (jsonData["message"] == "success")
