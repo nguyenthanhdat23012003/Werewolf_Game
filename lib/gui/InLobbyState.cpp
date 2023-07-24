@@ -38,6 +38,7 @@ void InLobbyState::handleEvents(SDL_Event& e) {
         const SDL_Rect leaveButtonRect = { 1000, 650, 100, 30 };
         if (renderer.isPointInRect(mouseX, mouseY, leaveButtonRect)) {
             printf("Clicked on LEAVE button!\n");
+            requestHelper->sendRequest(std::to_string(CommandMessage::LEAVE));
             GameState::setCurrentState(GameState::State::LOBBY_LIST);
         }
     }

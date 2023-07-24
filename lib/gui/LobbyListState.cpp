@@ -42,6 +42,14 @@ void LobbyListState::handleEvents(SDL_Event& e) {
                 cerr << "Failed to parse JSON response: " << e.what() << endl;
             }
         }
+
+        // Check for click on the "CREATE ROOM" button
+        const SDL_Rect createButtonRect = { 1000, 560, 120, 30 };
+        if (renderer.isPointInRect(mouseX, mouseY, createButtonRect)) {
+            printf("Clicked on CREATE ROOM button!\n");
+            requestHelper->sendRequest(to_string(CommandMessage::CREATE));
+            GameState::setCurrentState(GameState::State::IN_LOBBY);
+        }
     }
 }
 
@@ -72,8 +80,10 @@ void LobbyListState::render() {
         i++;
     }
 
-    renderer.drawRect(1000, 600, 120, 30, 255, 255, 255);
+    renderer.drawRect(1000, 600, 170, 30, 255, 255, 255);
     renderer.drawText("REFRESH", 1000 + 10, 600, 0, 0, 0);
+    renderer.drawRect(1000, 560, 170, 30, 255, 255, 255);
+    renderer.drawText("CREATE ROOM", 1000 + 10, 560, 0, 0, 0);
 
     SDL_UpdateWindowSurface(renderer.getWindow());
 }
