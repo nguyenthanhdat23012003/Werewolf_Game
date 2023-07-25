@@ -22,8 +22,8 @@ void InGameState::handleEvents(SDL_Event& e) {
                 if (renderer.isPointInRect(mouseX, mouseY, voteButtonRect)) {
                     std::cout <<"Clicked on VOTE button for player " << inGameData["players"][i]["id"] << std::endl;
                     // Perform actions when the "VOTE" button is clicked
-                    int playerId = inGameData["players"][i]["id"];
-                    std::string voteMessage = std::to_string(GameMessage::VOTE) + " " + std::to_string(playerId);
+                    int targetId = inGameData["players"][i]["id"];
+                    std::string voteMessage = std::to_string(GameMessage::VOTE) + " " + std::to_string(targetId);
                     std::string response = requestHelper->sendRequest(voteMessage);
                 }
             } else {
@@ -31,6 +31,9 @@ void InGameState::handleEvents(SDL_Event& e) {
                 if (renderer.isPointInRect(mouseX, mouseY, nightActionButtonRect)) {
                     std::cout <<"Clicked on NIGHT ACTION button for player " << inGameData["players"][i]["id"] << std::endl;
                     // Perform actions when the "NIGHT ACTION" button is clicked
+                    int targetId = inGameData["players"][i]["id"];
+                    std::string nightActionMessage = std::to_string(GameMessage::NIGHT_ACTION) + " " + std::to_string(targetId);
+                    std::string response = requestHelper->sendRequest(nightActionMessage);
                 }
             }
         }
@@ -91,7 +94,12 @@ void InGameState::render() {
             renderer.drawRect(100, 100 + (index - 1) * 50, 20, 20, 0, 255, 0); // Green square to indicate the player's character
             renderer.drawText(character, 400, 100 + (index - 1) * 50, 255, 255, 255);
         } else {
-            renderer.drawText("Hidden", 400, 100 + (index - 1) * 50, 255, 255, 255);
+            if (inGameData["yourCharacter"] == "Seer" && (std::find(inGameData["seenList"].begin(), inGameData["seenList"].end(), player["id"]) != inGameData["seenList"].end())) {
+                std::string character = player["character"];
+                renderer.drawText(character, 400, 100 + (index - 1) * 50, 255, 255, 255);
+            } else {
+                renderer.drawText("Hidden", 400, 100 + (index - 1) * 50, 255, 255, 255);
+            }
             // Conditionally render "VOTE" or "NIGHT ACTION" button
             if (isDay) {
                 renderer.drawRect(800, 100 + (index - 1) * 50, 100, 30, 255, 255, 255);

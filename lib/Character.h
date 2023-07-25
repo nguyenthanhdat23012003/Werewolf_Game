@@ -70,11 +70,19 @@ public:
 class Seer final : public Character
 {
 public:
-    Seer() : Character(1, 0) {}
+    Seer() : Character(1, 0), seenList() {}
 
     string getName() const override
     {
         return "Seer";
+    }
+
+    vector<int> getSeenList() {
+        return seenList;
+    }
+
+    void clearSeenList() {
+        seenList.clear();
     }
 
     void nightAction() override
@@ -84,6 +92,8 @@ public:
 
     void nightAction(Character *target) override
     {
+        cout << "Flag\n";
+        seenList.push_back(target->sd);
         cout << getName() << " performed night action!\n";
 //        string predictionMessage = "Target character is " + target->getName() + "\n";
 //        write(this->sd, predictionMessage.c_str(), predictionMessage.length());
@@ -98,6 +108,8 @@ public:
     {
         cout << getName() << " performed day action!\n";
     }
+private:
+    vector<int> seenList;
 };
 
 class Villager final : public Character

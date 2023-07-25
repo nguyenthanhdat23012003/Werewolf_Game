@@ -101,6 +101,16 @@ public:
         gameStatus["isGameEnded"] = isGameEnded;
         gameStatus["message"] = "success";
         gameStatus["isDay"] = isDay;
+        gameStatus["yourCharacter"] = idToCharacter[sd]->getName();
+        if (gameStatus["yourCharacter"] == "Seer") {
+            Character* currentCharacter = idToCharacter[sd];
+            Seer* seer = static_cast<Seer*>(currentCharacter);
+            json seenList = json::array();
+            for (int i : seer->getSeenList()) {
+                seenList.push_back(i);
+            }
+            gameStatus["seenList"] = seenList;
+        }
 
         // Create a JSON array for players
         json playersJson = json::array();
