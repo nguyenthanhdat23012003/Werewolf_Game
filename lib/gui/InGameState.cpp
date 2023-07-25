@@ -82,23 +82,26 @@ void InGameState::render() {
     int index = 1; // Start the index from 1
     for (const auto& player : inGameData["players"]) {
         std::string character = player["character"];
-        int id = player["id"];
         bool isAlive = player["isAlive"];
 
         std::string status = isAlive ? "Alive" : "Dead";
 
         renderer.drawText(std::to_string(index), 200, 100 + (index - 1) * 50, 255, 255, 255);
-        renderer.drawText(character, 400, 100 + (index - 1) * 50, 255, 255, 255);
-        renderer.drawText(status, 600, 100 + (index - 1) * 50, 255, 255, 255);
-
-        // Conditionally render "VOTE" or "NIGHT ACTION" button
-        if (isDay) {
-            renderer.drawRect(800, 100 + (index - 1) * 50, 100, 30, 255, 255, 255);
-            renderer.drawText("VOTE", 800 + 20, 100 + (index - 1) * 50, 0, 0, 0);
+        if (player["id"] == inGameData["from"]) {
+            renderer.drawRect(100, 100 + (index - 1) * 50, 20, 20, 0, 255, 0); // Green square to indicate the player's character
+            renderer.drawText(character, 400, 100 + (index - 1) * 50, 255, 255, 255);
         } else {
-            renderer.drawRect(800, 100 + (index - 1) * 50, 180, 30, 255, 255, 255);
-            renderer.drawText("NIGHT ACTION", 800 + 10, 100 + (index - 1) * 50, 0, 0, 0);
+            renderer.drawText("Hidden", 400, 100 + (index - 1) * 50, 255, 255, 255);
+            // Conditionally render "VOTE" or "NIGHT ACTION" button
+            if (isDay) {
+                renderer.drawRect(800, 100 + (index - 1) * 50, 100, 30, 255, 255, 255);
+                renderer.drawText("VOTE", 800 + 20, 100 + (index - 1) * 50, 0, 0, 0);
+            } else {
+                renderer.drawRect(800, 100 + (index - 1) * 50, 180, 30, 255, 255, 255);
+                renderer.drawText("NIGHT ACTION", 800 + 10, 100 + (index - 1) * 50, 0, 0, 0);
+            }
         }
+        renderer.drawText(status, 600, 100 + (index - 1) * 50, 255, 255, 255);
         index++;
     }
 
