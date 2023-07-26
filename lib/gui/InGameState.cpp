@@ -18,7 +18,7 @@ void InGameState::handleEvents(SDL_Event& e) {
         // Check if the mouse click is within the "VOTE" or "NIGHT ACTION" button
         for (int i = 0; i < inGameData["players"].size(); ++i) {
             if (isDay) {
-                const SDL_Rect voteButtonRect = { 800, 100 + i * 50, 100, 30 };
+                const SDL_Rect voteButtonRect = { 700, 100 + i * 50, 100, 30 };
                 if (renderer.isPointInRect(mouseX, mouseY, voteButtonRect)) {
                     std::cout <<"Clicked on VOTE button for player " << inGameData["players"][i]["id"] << std::endl;
                     // Perform actions when the "VOTE" button is clicked
@@ -27,7 +27,7 @@ void InGameState::handleEvents(SDL_Event& e) {
                     std::string response = requestHelper->sendRequest(voteMessage);
                 }
             } else {
-                const SDL_Rect nightActionButtonRect = { 800, 100 + i * 50, 180, 30 };
+                const SDL_Rect nightActionButtonRect = { 700, 100 + i * 50, 100, 30 };
                 if (renderer.isPointInRect(mouseX, mouseY, nightActionButtonRect)) {
                     std::cout <<"Clicked on NIGHT ACTION button for player " << inGameData["players"][i]["id"] << std::endl;
                     // Perform actions when the "NIGHT ACTION" button is clicked
@@ -55,16 +55,31 @@ void InGameState::update() {
             if (inGameData["isDay"] != isDay) {
                 std::cout << "Toggle\n";
                 isDay = !isDay; // Toggle the day state
-                lastDayChangeTime = currentTime; // Update the last day change time
             }
         } catch (const json::exception& e) {
             std::cerr << "Failed to parse JSON response: " << e.what() << std::endl;
         }
+        lastDayChangeTime = currentTime; // Update the last day change time
     }
+
+//    // Request GET_CHAT every 1 second
+//    std::cout << "Flag\n";
+//    if (currentTime - lastChatRequestTime >= CHAT_REQUEST_INTERVAL) {
+//        std::string response = requestHelper->sendRequest(std::to_string(GameMessage::GET_CHAT));
+//        std::cout << response << std::endl;
+//        try {
+//            json jsonData = json::parse(response);
+//            chatMessages = jsonData; // Save the chat messages received from the server
+//        } catch (const json::exception& e) {
+//            std::cerr << "Failed to parse JSON response: " << e.what() << std::endl;
+//        }
+//        lastChatRequestTime = currentTime; // Update the last chat request time
+//    }
 }
 
 void InGameState::render() {
     if (firstRender) {
+        std::cout << "First InGameState Render" << std::endl;
         std::string response = requestHelper->sendRequest(std::to_string(CommandMessage::IN_GAME));
         std::cout << response << std::endl;
         try {
@@ -102,20 +117,32 @@ void InGameState::render() {
             }
             // Conditionally render "VOTE" or "NIGHT ACTION" button
             if (isDay) {
-                renderer.drawRect(800, 100 + (index - 1) * 50, 100, 30, 255, 255, 255);
-                renderer.drawText("VOTE", 800 + 20, 100 + (index - 1) * 50, 0, 0, 0);
+                renderer.drawRect(700, 100 + (index - 1) * 50, 100, 30, 255, 255, 255);
+                renderer.drawText("VOTE", 700 + 20, 100 + (index - 1) * 50, 0, 0, 0);
             } else {
-                renderer.drawRect(800, 100 + (index - 1) * 50, 180, 30, 255, 255, 255);
-                renderer.drawText("NIGHT ACTION", 800 + 10, 100 + (index - 1) * 50, 0, 0, 0);
+                renderer.drawRect(700, 100 + (index - 1) * 50, 100, 30, 255, 255, 255);
+                renderer.drawText("ACTION", 700 + 10, 100 + (index - 1) * 50, 0, 0, 0);
             }
         }
         renderer.drawText(status, 600, 100 + (index - 1) * 50, 255, 255, 255);
         index++;
     }
 
+    //Draw the chat box and header
+    renderer.drawRect(950, 50, 250, 400, 255, 255, 255);
+    renderer.drawText("CHAT", 950 + 90, 50, 0, 0, 0);
+    // Draw the chat messages
+    int chatIndex = 0;
+    for (const auto& chat : inGameData["chatHistory"]) {
+        std::string message = chat["message"];
+        int playerId = chat["from"];
+        renderer.drawText(std::to_string(playerId) + ": " + message, 950 + 10, 90 + chatIndex * 30, 0, 0, 0);
+        chatIndex++;
+    }
+
     if (inGameData["isGameEnded"]) {
-        renderer.drawRect(1280/2-100, 720/2-10, 200, 30, 255, 255, 255);
-        renderer.drawText("GAME END!", 1280/2-80, 720/2-10, 0, 0, 0);
+        renderer.drawRect(1280/2-75, 720/2-10, 150, 30, 255, 255, 255);
+        renderer.drawText("GAME END!", 1280/2-60, 720/2-10, 0, 0, 0);
     }
 
     // Update the window surface

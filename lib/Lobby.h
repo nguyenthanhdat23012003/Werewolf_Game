@@ -114,6 +114,10 @@ public:
         endGame();
     }
 
+    void appendToInGameChatHistory(int from, string content) {
+        game->appendToChatHistory(from, content);
+    }
+
     void sendGameStatus() {
         if (isGameStarted) {
             game->status();
@@ -125,13 +129,6 @@ public:
             game->statusTo(sd);
     }
 
-    void promptNight() {
-        if (isGameStarted) {
-            game->promptNight();
-            return;
-        }
-    }
-
     void performNight(int fromId, int toId) {
         if (isGameStarted) {
             game->performNight(fromId, toId);
@@ -139,23 +136,9 @@ public:
         }
     }
 
-    void promptDay() {
-        if (isGameStarted) {
-            game->promptDay();
-            return;
-        }
-    }
-
     void performDay(int fromId, int toIndex) {
         if (isGameStarted) {
             game->performDay(fromId, toIndex);
-            return;
-        }
-    }
-
-    void promptVote() {
-        if (isGameStarted) {
-            game->promptVote();
             return;
         }
     }
@@ -180,14 +163,6 @@ public:
 
     void endGame() {
         if (isGameStarted) {
-            // Send end game message to all players
-//            std::string endMessage = "The game has ended!";
-//            for (const auto& player : players) {
-//                int playerId = player.first;
-//                write(playerId, endMessage.c_str(), endMessage.length());
-//            }
-
-
             // Reset player statuses to NotReady
             for (auto& player : players) {
                 player.second = PlayerStatus::NotReady;

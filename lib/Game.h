@@ -14,6 +14,7 @@ private:
     vector<Character *> characters; // Stores the characters of the players
     unordered_map<int, Character *> idToCharacter;
     vector<int> playersId;
+    std::vector<std::pair<int, std::string>> chatHistory;
 
     void initializeCharacters() {
         // Shuffle the playersId vector
@@ -56,6 +57,16 @@ public:
     Game(vector<int> playersId) : n_players(playersId.size()), playersId(playersId) {
         // Initialize the characters based on the number of players
         initializeCharacters();
+        // Clear chat history at the start of the game
+        chatHistory.clear();
+    }
+
+    std::vector<std::pair<int, std::string>> getChatHistory() {
+        return chatHistory;
+    }
+
+    void appendToChatHistory(int playerId, const std::string& message) {
+        chatHistory.push_back(std::make_pair(playerId, message));
     }
 
     void status() {
@@ -123,6 +134,17 @@ public:
             playersJson.push_back(playerJson);
         }
         gameStatus["players"] = playersJson;
+
+        // Create a JSON array for chat history
+        json chatArray = json::array();
+        for (const auto &chat : chatHistory)
+        {
+            json chatJson;
+            chatJson["from"] = chat.first;
+            chatJson["message"] = chat.second;
+            chatArray.push_back(chatJson);
+        }
+        gameStatus["chatHistory"] = chatArray;
 
         // Convert the JSON object to a string
         std::string jsonStr = gameStatus.dump();

@@ -534,18 +534,35 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
     }
     else if (request.substr(0, 3) == to_string(GameMessage::CHAT))
     {
-        cout << "This is a chat request!\n";
-
-        // Send response to all clients
-        string response = getContentOfChatRequestBody(request);
-        cout << "Content: " << response << endl;
-        for (int i = 0; i < maxClients; i++)
+        string chatContent = getContentOfChatRequestBody(request);
+        auto it = clientToLobbyMap.find(sd);
+        if (it != clientToLobbyMap.end())
         {
-            if (clientSockets[i] != 0)
-            {
-                write(clientSockets[i], response.c_str(), response.length());
+            int lobbyId = it->second;
+            Lobby lobby;
+            for (auto l : lobbies) {
+                if (l.getId() == lobbyId) {
+                    lobby = l;
+                    break;
+                }
             }
+            lobby.appendToInGameChatHistory(sd, chatContent);
+            json responseJson;
+            responseJson["from"] = sd;
+            responseJson["message"] = "success";
+
+            string response = responseJson.dump();
+            write(sd, response.c_str(), response.length());
         }
+        else
+        {
+            json responseJson;
+            responseJson["from"] = sd;
+            responseJson["message"] = "failure";
+            string response = responseJson.dump();
+            write(sd, response.c_str(), response.length());
+        }
+        return;
     }
     else
     {
