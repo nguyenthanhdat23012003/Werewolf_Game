@@ -15,6 +15,7 @@ class InGameState {
 public:
     InGameState(SDL_Window* window, TTF_Font* font, RequestHelper* helper);
 
+    void handleTextInputEvent(SDL_Event& e);
     void handleEvents(SDL_Event& e);
     void update();
     void render();
@@ -27,6 +28,9 @@ private:
     bool firstRender;
     Uint32 lastDayChangeTime;
     const Uint32 DAY_CHANGE_INTERVAL = 1000;
+    bool isChatInputFocused;// To keep track of whether the chat input form is focused or not
+    std::string chatInputText;       // To store the text entered by the player in the chat input form
+
 };
 
 #endif // INGAMESTATE_H

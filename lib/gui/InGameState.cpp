@@ -8,6 +8,21 @@ InGameState::InGameState(SDL_Window* window, TTF_Font* font, RequestHelper* help
     isDay = false; // Set initial time data to "day"
     firstRender = true;
     lastDayChangeTime = SDL_GetTicks();
+    isChatInputFocused = false;
+    chatInputText = "";
+}
+
+void InGameState::handleTextInputEvent(SDL_Event& e) {
+    if (isChatInputFocused && e.type == SDL_TEXTINPUT) {
+        // Append the received text to the chat input text
+        chatInputText += e.text.text;
+    } else if (isChatInputFocused && e.type == SDL_KEYDOWN) {
+        // Handle special keys like backspace
+        if (e.key.keysym.sym == SDLK_BACKSPACE && !chatInputText.empty()) {
+            // Erase the last character from the chat input text
+            chatInputText.pop_back();
+        }
+    }
 }
 
 void InGameState::handleEvents(SDL_Event& e) {
@@ -35,6 +50,38 @@ void InGameState::handleEvents(SDL_Event& e) {
                     std::string nightActionMessage = std::to_string(GameMessage::NIGHT_ACTION) + " " + std::to_string(targetId);
                     std::string response = requestHelper->sendRequest(nightActionMessage);
                 }
+            }
+        }
+    }
+    if (e.type == SDL_MOUSEBUTTONDOWN) {
+        int mouseX = e.button.x;
+        int mouseY = e.button.y;
+
+        const SDL_Rect chatInputBoxRect = { 950, 460, 250, 30 };
+        if (renderer.isPointInRect(mouseX, mouseY, chatInputBoxRect)) {
+            isChatInputFocused = true;
+        } else {
+            isChatInputFocused = false;
+        }
+    }else if (e.type == SDL_TEXTINPUT) {
+        // Handle text input events when chat input is focused
+        handleTextInputEvent(e);
+    } else if (e.type == SDL_KEYDOWN) {
+        // Handle key press events
+        if (isChatInputFocused) {
+            if (e.key.keysym.sym == SDLK_RETURN) {
+                // Send chat message to the server
+                if (!chatInputText.empty()) {
+                    std::string chatMessage = std::to_string(GameMessage::CHAT) + " " + chatInputText;
+                    std::string response = requestHelper->sendRequest(chatMessage);
+                    // Optionally, handle the response from the server if needed
+                    // ...
+                    // Clear the chat input text after sending the message
+                    chatInputText = "";
+                }
+            } else if (e.key.keysym.sym == SDLK_BACKSPACE && !chatInputText.empty()) {
+                // Handle backspace key press when chat input is focused
+                chatInputText.pop_back();
             }
         }
     }
@@ -131,6 +178,9 @@ void InGameState::render() {
     //Draw the chat box and header
     renderer.drawRect(950, 50, 250, 400, 255, 255, 255);
     renderer.drawText("CHAT", 950 + 90, 50, 0, 0, 0);
+    // Draw the chat input box
+    renderer.drawRect(950, 460, 250, 30, 255, 0, 0);
+    renderer.drawText(chatInputText, 950 + 10, 460, 0, 0, 0);
     // Draw the chat messages
     int chatIndex = 0;
     for (const auto& chat : inGameData["chatHistory"]) {

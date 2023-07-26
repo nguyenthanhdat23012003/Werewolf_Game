@@ -18,6 +18,7 @@ TTF_Font* SDLRenderer::getFont() {
 }
 
 void SDLRenderer::drawText(const std::string& text, int x, int y, Uint8 r, Uint8 g, Uint8 b) {
+    if (text.empty()) return;
     SDL_Color textColor = { r, g, b, 1 };
     SDL_Surface* textSurface = TTF_RenderText_Solid(mFont, text.c_str(), textColor);
     if (textSurface == nullptr) {

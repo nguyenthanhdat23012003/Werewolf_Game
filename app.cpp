@@ -106,6 +106,7 @@ bool init() {
             gScreenSurface = SDL_GetWindowSurface(gWindow);
         }
     }
+    SDL_StartTextInput();
     requestHelper = new RequestHelper;
     return success;
 }
@@ -120,6 +121,8 @@ void close() {
 
     SDL_DestroyWindow(gWindow);
     gWindow = NULL;
+
+    SDL_StopTextInput();
 
     SDL_Quit();
 
