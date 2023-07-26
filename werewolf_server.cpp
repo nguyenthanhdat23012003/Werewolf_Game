@@ -29,6 +29,7 @@ vector<Lobby> lobbies;
 void parseHTTPRequest(const char *httpRequest, int httpRequestLength, char *requestBody, int &contentLength);
 void handleRequest(const string &request, int sd, int *clientSockets, int maxClients);
 string getContentOfChatRequestBody(const std::string &message);
+void removeClientFromLobby(int clientSocket, int *clientSockets, int maxClients);
 
 int main(int argc, char *argv[])
 {
@@ -159,10 +160,10 @@ int main(int argc, char *argv[])
                 valread = read(sd, buffer, sizeof(buffer));
                 if (valread == 0)
                 {
-                    // Close the socket and mark as 0 in the array for reuse
-                    printf("Closing a socket ...\n");
+                    // Client disconnected, remove them from the lobby and close the socket
+                    printf("Client disconnected: %d\n", sd);
                     close(sd);
-                    clientSockets[i] = 0;
+                    removeClientFromLobby(sd, clientSockets, maxClients);
                 }
                 else
                 {
@@ -173,11 +174,9 @@ int main(int argc, char *argv[])
                     int contentLength = 0;
                     parseHTTPRequest(buffer, strlen(buffer), requestBody, contentLength);
                     cout << "Request Body Parsed: " << requestBody << endl;
-                    // is this multithreading?
                     thread handleRequestThread(handleRequest, requestBody, sd, clientSockets, maxClients);
                     handleRequestThread.detach();
                     break;
-                    //handleRequest(requestBody, sd, clientSockets, maxClients);
                 }
             }
         }
@@ -564,4 +563,26 @@ string getContentOfChatRequestBody(const std::string &body)
         return content;
     }
     return "";
+}
+
+void removeClientFromLobby(int clientSocket, int *clientSockets, int maxClients)
+{
+    for (Lobby &lobby : lobbies)
+    {
+        if (lobby.hasPlayer(clientSocket))
+        {
+            lobby.removePlayer(clientSocket);
+            break;
+        }
+    }
+
+    // Find the index of the clientSocket in the array and set it to 0 (indicating available slot)
+    for (int i = 0; i < maxClients; i++)
+    {
+        if (clientSockets[i] == clientSocket)
+        {
+            clientSockets[i] = 0;
+            break;
+        }
+    }
 }
