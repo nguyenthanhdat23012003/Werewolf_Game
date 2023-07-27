@@ -241,6 +241,10 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
     }
     else if (request.substr(0, 3) == to_string(CommandMessage::NEW))
     {
+        // Remove empty lobbies
+        lobbies.erase(remove_if(lobbies.begin(), lobbies.end(), [](const Lobby& lobby) {
+            return lobby.getLobbySize() == 0;
+        }), lobbies.end());
         // Create a JSON array for lobbies
         json j = json::array();
 
