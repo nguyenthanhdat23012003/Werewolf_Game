@@ -101,6 +101,11 @@ void LobbyListState::update() {
 }
 
 void LobbyListState::render() {
+    SDL_Surface* background = renderer.loadAndStretchImage("images/background.bmp", 1280, 720);
+    if (background != nullptr) {
+        SDL_BlitSurface(background, nullptr, renderer.getScreenSurface(), nullptr);
+        SDL_FreeSurface(background); // Free the background surface after drawing
+    }
     // Draw the lobby list table
     // Draw table header
     renderer.drawText("ID", 200, 50, 255, 255, 255);

@@ -64,6 +64,11 @@ void InLobbyState::update() {
 }
 
 void InLobbyState::render() {
+    SDL_Surface* background = renderer.loadAndStretchImage("images/background.bmp", 1280, 720);
+    if (background != nullptr) {
+        SDL_BlitSurface(background, nullptr, renderer.getScreenSurface(), nullptr);
+        SDL_FreeSurface(background); // Free the background surface after drawing
+    }
     if (firstRender) {
         std::string response = requestHelper->sendRequest(std::to_string(CommandMessage::IN_LOBBY));
         std::cout << response << std::endl;

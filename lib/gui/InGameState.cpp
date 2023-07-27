@@ -132,6 +132,11 @@ void InGameState::update() {
 }
 
 void InGameState::render() {
+    SDL_Surface* background = renderer.loadAndStretchImage("images/background.bmp", 1280, 720);
+    if (background != nullptr) {
+        SDL_BlitSurface(background, nullptr, renderer.getScreenSurface(), nullptr);
+        SDL_FreeSurface(background); // Free the background surface after drawing
+    }
     if (firstRender) {
         std::cout << "First InGameState Render" << std::endl;
         std::string response = requestHelper->sendRequest(std::to_string(CommandMessage::IN_GAME));
