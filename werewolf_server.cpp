@@ -486,7 +486,6 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
     else if (request.substr(0, 3) == std::to_string(GameMessage::DAY_ACTION))
     {
         if (clientToLobbyMap.find(sd) != clientToLobbyMap.end()) {
-            write(sd, "You perform a day action", strlen("You perform a day action"));
             string messageCode, targetIndexStr;
             istringstream iss(request.substr(0));
             iss >> messageCode >> targetIndexStr;
@@ -507,7 +506,6 @@ void handleRequest(const string &request, int sd, int *clientSockets, int maxCli
     else if (request.substr(0, 3) == std::to_string(GameMessage::VOTE))
     {
         if (clientToLobbyMap.find(sd) != clientToLobbyMap.end()) {
-            write(sd, "You voted", strlen("You voted"));
             string messageCode, targetIdStr;
             istringstream iss(request.substr(0));
             iss >> messageCode >> targetIdStr;
