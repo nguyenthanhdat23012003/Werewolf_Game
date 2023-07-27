@@ -113,6 +113,7 @@ public:
         gameStatus["message"] = "success";
         gameStatus["isDay"] = isDay;
         gameStatus["yourCharacter"] = idToCharacter[sd]->getName();
+        gameStatus["yourStatus"] = idToCharacter[sd]->isAlive;
         if (gameStatus["yourCharacter"] == "Seer") {
             Character* currentCharacter = idToCharacter[sd];
             Seer* seer = static_cast<Seer*>(currentCharacter);

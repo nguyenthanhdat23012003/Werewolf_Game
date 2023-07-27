@@ -31,7 +31,7 @@ private:
     bool isChatInputFocused;// To keep track of whether the chat input form is focused or not
     std::string chatInputText;       // To store the text entered by the player in the chat input form
     bool hasActed;
-
+    std::vector<int> randomIndexOrder;
 };
 
 #endif // INGAMESTATE_H

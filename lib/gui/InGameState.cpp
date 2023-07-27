@@ -13,6 +13,7 @@ InGameState::InGameState(SDL_Window* window, TTF_Font* font, RequestHelper* help
     isChatInputFocused = false;
     chatInputText = "";
     hasActed = false;
+    randomIndexOrder = {};
 }
 
 void InGameState::handleTextInputEvent(SDL_Event& e) {
@@ -40,7 +41,7 @@ void InGameState::handleEvents(SDL_Event& e) {
                 if (renderer.isPointInRect(mouseX, mouseY, voteButtonRect)) {
                     std::cout <<"Clicked on VOTE button for player " << inGameData["players"][i]["id"] << std::endl;
                     // Perform actions when the "VOTE" button is clicked
-                    int targetId = inGameData["players"][i]["id"];
+                    int targetId = inGameData["players"][randomIndexOrder[i]]["id"];
                     std::string voteMessage = std::to_string(GameMessage::VOTE) + " " + std::to_string(targetId);
                     std::string response = requestHelper->sendRequest(voteMessage);
                     hasActed = true;
@@ -50,7 +51,7 @@ void InGameState::handleEvents(SDL_Event& e) {
                 if (renderer.isPointInRect(mouseX, mouseY, nightActionButtonRect)) {
                     std::cout <<"Clicked on NIGHT ACTION button for player " << inGameData["players"][i]["id"] << std::endl;
                     // Perform actions when the "NIGHT ACTION" button is clicked
-                    int targetId = inGameData["players"][i]["id"];
+                    int targetId = inGameData["players"][randomIndexOrder[i]]["id"];
                     std::string nightActionMessage = std::to_string(GameMessage::NIGHT_ACTION) + " " + std::to_string(targetId);
                     std::string response = requestHelper->sendRequest(nightActionMessage);
                     hasActed = true;
@@ -131,7 +132,6 @@ void InGameState::update() {
 }
 
 void InGameState::render() {
-    static std::vector<int> randomIndexOrder = {};
     if (firstRender) {
         std::cout << "First InGameState Render" << std::endl;
         std::string response = requestHelper->sendRequest(std::to_string(CommandMessage::IN_GAME));
@@ -178,7 +178,7 @@ void InGameState::render() {
                 renderer.drawText("Hidden", 400, 100 + (index - 1) * 50, 255, 255, 255);
             }
             // Conditionally render "VOTE" or "NIGHT ACTION" button
-            if (!hasActed) {
+            if (inGameData["yourStatus"] && !hasActed && isAlive) {
                 if (isDay) {
                     renderer.drawRect(700, 100 + (index - 1) * 50, 100, 30, 255, 255, 255);
                     renderer.drawText("VOTE", 700 + 20, 100 + (index - 1) * 50, 0, 0, 0);
