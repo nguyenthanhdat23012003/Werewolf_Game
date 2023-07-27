@@ -1,5 +1,7 @@
 #pragma GCC diagnostic ignored "-Wsign-compare"
 #include "InGameState.h"
+#include <algorithm>
+#include <random>
 
 InGameState::InGameState(SDL_Window* window, TTF_Font* font, RequestHelper* helper) : renderer(window, font), requestHelper(helper) {
     // Initialize players data
@@ -10,6 +12,7 @@ InGameState::InGameState(SDL_Window* window, TTF_Font* font, RequestHelper* help
     lastDayChangeTime = SDL_GetTicks();
     isChatInputFocused = false;
     chatInputText = "";
+    hasActed = false;
 }
 
 void InGameState::handleTextInputEvent(SDL_Event& e) {
@@ -40,6 +43,7 @@ void InGameState::handleEvents(SDL_Event& e) {
                     int targetId = inGameData["players"][i]["id"];
                     std::string voteMessage = std::to_string(GameMessage::VOTE) + " " + std::to_string(targetId);
                     std::string response = requestHelper->sendRequest(voteMessage);
+                    hasActed = true;
                 }
             } else {
                 const SDL_Rect nightActionButtonRect = { 700, 100 + i * 50, 100, 30 };
@@ -49,6 +53,7 @@ void InGameState::handleEvents(SDL_Event& e) {
                     int targetId = inGameData["players"][i]["id"];
                     std::string nightActionMessage = std::to_string(GameMessage::NIGHT_ACTION) + " " + std::to_string(targetId);
                     std::string response = requestHelper->sendRequest(nightActionMessage);
+                    hasActed = true;
                 }
             }
         }
@@ -102,6 +107,7 @@ void InGameState::update() {
             if (inGameData["isDay"] != isDay) {
                 std::cout << "Toggle\n";
                 isDay = !isDay; // Toggle the day state
+                hasActed = false;
             }
         } catch (const json::exception& e) {
             std::cerr << "Failed to parse JSON response: " << e.what() << std::endl;
@@ -125,6 +131,7 @@ void InGameState::update() {
 }
 
 void InGameState::render() {
+    static std::vector<int> randomIndexOrder = {};
     if (firstRender) {
         std::cout << "First InGameState Render" << std::endl;
         std::string response = requestHelper->sendRequest(std::to_string(CommandMessage::IN_GAME));
@@ -132,6 +139,12 @@ void InGameState::render() {
         try {
             json jsonData = json::parse(response);
             inGameData = jsonData;
+            for (int i = 0; i < inGameData["players"].size(); ++i) {
+                randomIndexOrder.push_back(i);
+            }
+            std::random_device rd;
+            std::mt19937 g(rd());
+            std::shuffle(randomIndexOrder.begin(), randomIndexOrder.end(), g);
         } catch (const json::exception& e) {
             std::cerr << "Failed to parse JSON response: " << e.what() << std::endl;
         }
@@ -145,13 +158,15 @@ void InGameState::render() {
 
     // Draw table data
     int index = 1; // Start the index from 1
-    for (const auto& player : inGameData["players"]) {
+    for (int randomIndex : randomIndexOrder) {
+        const auto& player = inGameData["players"][randomIndex];
+        int playerId = player["id"]; // Get the Player ID from the data
         std::string character = player["character"];
         bool isAlive = player["isAlive"];
 
         std::string status = isAlive ? "Alive" : "Dead";
 
-        renderer.drawText(std::to_string(index), 200, 100 + (index - 1) * 50, 255, 255, 255);
+        renderer.drawText(std::to_string(playerId), 200, 100 + (index - 1) * 50, 255, 255, 255);
         if (player["id"] == inGameData["from"]) {
             renderer.drawRect(100, 100 + (index - 1) * 50, 20, 20, 0, 255, 0); // Green square to indicate the player's character
             renderer.drawText(character, 400, 100 + (index - 1) * 50, 255, 255, 255);
@@ -163,12 +178,14 @@ void InGameState::render() {
                 renderer.drawText("Hidden", 400, 100 + (index - 1) * 50, 255, 255, 255);
             }
             // Conditionally render "VOTE" or "NIGHT ACTION" button
-            if (isDay) {
-                renderer.drawRect(700, 100 + (index - 1) * 50, 100, 30, 255, 255, 255);
-                renderer.drawText("VOTE", 700 + 20, 100 + (index - 1) * 50, 0, 0, 0);
-            } else {
-                renderer.drawRect(700, 100 + (index - 1) * 50, 100, 30, 255, 255, 255);
-                renderer.drawText("ACTION", 700 + 10, 100 + (index - 1) * 50, 0, 0, 0);
+            if (!hasActed) {
+                if (isDay) {
+                    renderer.drawRect(700, 100 + (index - 1) * 50, 100, 30, 255, 255, 255);
+                    renderer.drawText("VOTE", 700 + 20, 100 + (index - 1) * 50, 0, 0, 0);
+                } else {
+                    renderer.drawRect(700, 100 + (index - 1) * 50, 100, 30, 255, 255, 255);
+                    renderer.drawText("ACTION", 700 + 10, 100 + (index - 1) * 50, 0, 0, 0);
+                }
             }
         }
         renderer.drawText(status, 600, 100 + (index - 1) * 50, 255, 255, 255);
@@ -179,7 +196,11 @@ void InGameState::render() {
     renderer.drawRect(950, 50, 250, 400, 255, 255, 255);
     renderer.drawText("CHAT", 950 + 90, 50, 0, 0, 0);
     // Draw the chat input box
-    renderer.drawRect(950, 460, 250, 30, 255, 0, 0);
+    if (isChatInputFocused) {
+        renderer.drawRect(950, 460, 250, 30, 150, 0, 0);
+    } else {
+        renderer.drawRect(950, 460, 250, 30, 50, 0, 0);
+    }
     renderer.drawText(chatInputText, 950 + 10, 460, 0, 0, 0);
     // Draw the chat messages
     int chatIndex = 0;

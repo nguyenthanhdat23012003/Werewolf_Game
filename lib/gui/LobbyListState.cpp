@@ -80,10 +80,10 @@ void LobbyListState::render() {
         i++;
     }
 
-    renderer.drawRect(1000, 600, 170, 30, 255, 255, 255);
+    renderer.drawRect(1000, 600, 120, 30, 255, 255, 255);
     renderer.drawText("REFRESH", 1000 + 10, 600, 0, 0, 0);
-    renderer.drawRect(1000, 560, 170, 30, 255, 255, 255);
-    renderer.drawText("CREATE ROOM", 1000 + 10, 560, 0, 0, 0);
+    renderer.drawRect(1000, 560, 120, 30, 255, 255, 255);
+    renderer.drawText("CREATE", 1000 + 15, 560, 0, 0, 0);
 
     SDL_UpdateWindowSurface(renderer.getWindow());
 }

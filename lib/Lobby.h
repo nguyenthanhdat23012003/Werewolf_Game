@@ -106,7 +106,7 @@ public:
 //            write(playerId, startMessage.c_str(), startMessage.length());
 //        }
         do {
-            this_thread::sleep_for(chrono::seconds(10));
+            this_thread::sleep_for(chrono::seconds(60));
             if (game->getIsDay()) processVote();
             game->toggleIsDay();
         } while (!isGameEnded());
