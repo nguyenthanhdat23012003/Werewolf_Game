@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -Wall -Wextra
-LIBS = -lSDL2 -lSDL2_ttf
+LIBS = -lSDL2 -lSDL2_ttf -lpthread
 
 # Directories for source files and object files
 SRCDIR = .
@@ -21,10 +21,10 @@ APP_OBJS = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(APP_SRCS))
 all: werewolf_server werewolf_client app
 
 werewolf_server: $(SERVER_OBJS)
-	$(CC) $(CFLAGS) -o $@ $(SERVER_OBJS)
+	$(CC) $(CFLAGS) -o $@ $(SERVER_OBJS) -lpthread
 
 werewolf_client: $(CLIENT_OBJS)
-	$(CC) $(CFLAGS) -o $@ $(CLIENT_OBJS)
+	$(CC) $(CFLAGS) -o $@ $(CLIENT_OBJS) -lpthread
 
 app: $(APP_OBJS)
 	$(CC) $(CFLAGS) -o $@ $(APP_OBJS) $(LIBS)
